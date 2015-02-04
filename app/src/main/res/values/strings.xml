@@ -4,5 +4,24 @@
     <string name="app_name">FollowMe</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    <string name="my_music">My Music</string>
+    <string name="radio">Radio</string>
+    <string name="action_users_settings">Users settings</string>
+    <string name="action_rooms_settings">Rooms settings</string>
+    <string name="action_speakers_settings">Speakers settings</string>
+    <string name="action_doors_settings">Doors settings</string>
+    <string name="modify">Modify</string>
+    <string name="add">Add new one</string>
+    <string name="addNewSpeakerMessageEthernet">Please connect playBox with ethernet</string>
+    <string name="recognizingWait">wait for the recognizing...</string>
+    <string name="and">and</string>
+    <string name="speakerName">Speaker name</string>
+    <string name="validate">Validate</string>
+    <string name="password">Password</string>
+    <string name="wifiTest">Wifi Test</string>
+    <string name="errorWifiMessage">The wifi connection is not established</string>
+    <string name="braceletSynchroMessage">Please press during 3 seconde the bracelet play button</string>
+    <string name="userName">User name</string>
+    <string name="delete">Delete</string>
+    <string name="synchroMessage">Please wait for synchronisation with the SmartBox</string>
 </resources>
