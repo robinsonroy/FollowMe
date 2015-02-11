@@ -11,7 +11,7 @@ import android.widget.Button;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.R;
-import com.followme.followme.RoomSettingsActivity;
+import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 
 /**
@@ -84,12 +84,12 @@ public class NewUserActivity extends Activity implements View.OnClickListener{
                 finish();
                 return true;
 
-            case R.id.action_spotify_connection :
+            case R.id.action_rooms_settings :
                 finish();
                 ShowRoomsSettings();
                 return true;
 
-            case R.id.action_rooms_settings :
+            case R.id.action_speakers_settings :
                 finish();
                 showSpeakersSettings();
                 return true;

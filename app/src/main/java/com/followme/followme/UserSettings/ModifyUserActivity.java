@@ -12,7 +12,7 @@ import android.widget.EditText;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.R;
-import com.followme.followme.RoomSettingsActivity;
+import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 
 /**
@@ -47,9 +47,9 @@ public class ModifyUserActivity extends Activity implements View.OnClickListener
         bValidate.setOnClickListener(this);
 
 
-        String value = getIntent().getStringExtra("speakerName");
-        EditText speakerName = (EditText) findViewById(R.id.speakerName);
-        speakerName.setHint(value);
+        String value = getIntent().getStringExtra("UserName");
+        EditText userName = (EditText) findViewById(R.id.userName);
+        userName.setHint(value);
     }
 
 
@@ -93,12 +93,12 @@ public class ModifyUserActivity extends Activity implements View.OnClickListener
                 finish();
                 return true;
 
-            case R.id.action_spotify_connection :
+            case R.id.action_rooms_settings :
                 finish();
                 ShowRoomsSettings();
                 return true;
 
-            case R.id.action_rooms_settings :
+            case R.id.action_speakers_settings :
                 finish();
                 showSpeakersSettings();
                 return true;

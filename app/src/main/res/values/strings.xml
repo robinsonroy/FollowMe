@@ -24,4 +24,5 @@
     <string name="userName">User name</string>
     <string name="delete">Delete</string>
     <string name="synchroMessage">Please wait for synchronisation with the SmartBox</string>
+    <string name="roomName">Room name</string>
 </resources>

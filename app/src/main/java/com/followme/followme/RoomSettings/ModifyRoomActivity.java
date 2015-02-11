@@ -1,4 +1,4 @@
-package com.followme.followme;
+package com.followme.followme.RoomSettings;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,20 +6,34 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.R;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Robinson on 18/01/15.
  *
- * <b>Activité permettant d'ajouter ou de supprimer une pièce.</b>
+ * <b>Activité permettant d'ajouter, supprimer ou modifier une pièce.</b>
  *
  *  @author Robinson
  *  @version 1.0
  */
-public class RoomSettingsActivity extends Activity {
+public class ModifyRoomActivity extends Activity implements View.OnClickListener{
+
+    /**
+     * Bouton qui permet de modifier une pièce.
+     */
+    private Button bValidate = null;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -33,7 +47,14 @@ public class RoomSettingsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rooms_settings);
+        setContentView(R.layout.activity_modify_room);
+
+        bValidate = (Button) findViewById(R.id.validSettingName);
+        bValidate.setOnClickListener(this);
+
+        String value = getIntent().getStringExtra("RoomName");
+        EditText roomName = (EditText) findViewById(R.id.roomName);
+        roomName.setHint(value);
     }
 
     /**
@@ -103,7 +124,7 @@ public class RoomSettingsActivity extends Activity {
      * Ouvre l'activité de paramétrages des utilisateurs.
      */
     private void showUsersSettings(){
-        Intent I = new Intent(RoomSettingsActivity.this, UsersSettingsActivity.class);
+        Intent I = new Intent(ModifyRoomActivity.this, UsersSettingsActivity.class);
         startActivity(I);
     }
 
@@ -111,7 +132,7 @@ public class RoomSettingsActivity extends Activity {
      * Ouvre l'activité de paramètrages des enceintes.
      */
     private void showSpeakersSettings() {
-        Intent I = new Intent(RoomSettingsActivity.this, SpeakersSettingsActivity.class);
+        Intent I = new Intent(ModifyRoomActivity.this, SpeakersSettingsActivity.class);
         startActivity(I);
     }
 
@@ -119,7 +140,29 @@ public class RoomSettingsActivity extends Activity {
      * Ouvre l'activité de paramétrages des capteurs de proximité
      */
     private void showDoorsSettings() {
-        Intent I = new Intent(RoomSettingsActivity.this, DoorsSettingsActivity.class);
+        Intent I = new Intent(ModifyRoomActivity.this, DoorsSettingsActivity.class);
         startActivity(I);
+    }
+
+    private void changeName(){
+        finish();
+    }
+
+    /**
+     *
+     * @param v
+     *      le bouton cliqué
+     */
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        switch (id){
+            case R.id.validSettingName :
+                changeName();
+                break;
+            default:
+                break;
+        }
     }
 }

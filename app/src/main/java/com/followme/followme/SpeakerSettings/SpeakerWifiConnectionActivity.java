@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.R;
-import com.followme.followme.RoomSettingsActivity;
+import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 
 import java.util.ArrayList;

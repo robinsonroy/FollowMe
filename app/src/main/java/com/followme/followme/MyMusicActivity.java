@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 
