@@ -6,13 +6,8 @@
     <!-- The main content view -->
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rooms settings activity"
-            android:layout_centerHorizontal="true"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/mainInformation">
 
         <ListView
             android:id="@+id/listRooms"
@@ -50,6 +45,19 @@
 
         </LinearLayout>
 
+
+
     </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/errorConnection"
+        android:visibility="invisible">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/errorConnection"/>
+        </RelativeLayout>
     <!-- The navigation drawer -->
 </android.support.v4.widget.DrawerLayout>

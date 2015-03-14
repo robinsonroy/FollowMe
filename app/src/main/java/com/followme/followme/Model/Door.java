@@ -13,20 +13,18 @@ public class Door {
     @SerializedName("id")
     private int id;
 
-    @SerializedName("name")
-    private String name;
     @SerializedName("sensor1")
     private RFSensor sensor1;
     @SerializedName("sensor2")
     private RFSensor sensor2;
 
+    @Override
+    public String toString() {
+        return sensor1.getRoom().toString() + " - " + sensor2.getRoom().toString();
+    }
 
     public int getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public RFSensor getSensor1() {
@@ -41,10 +39,6 @@ public class Door {
         this.id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void setSensor1(RFSensor sensor1) {
         this.sensor1 = sensor1;
     }
@@ -52,7 +46,5 @@ public class Door {
     public void setSensor2(RFSensor sensor2) {
         this.sensor2 = sensor2;
     }
-
-
 
 }

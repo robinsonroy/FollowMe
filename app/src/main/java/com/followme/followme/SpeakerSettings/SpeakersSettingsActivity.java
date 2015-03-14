@@ -1,10 +1,11 @@
 package com.followme.followme.SpeakerSettings;
 
-import java.util.ArrayList;
 import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,9 +16,20 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.Room;
+import com.followme.followme.Model.Speaker;
 import com.followme.followme.R;
+import com.followme.followme.RoomSettings.ModifyRoomActivity;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
+import com.followme.followme.View.ErrorDialog;
+
+import org.parceler.Parcels;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Robinson on 18/01/15.
@@ -28,8 +40,18 @@ import com.followme.followme.UserSettings.UsersSettingsActivity;
  */
 public class SpeakersSettingsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
+
     /**
-     * Liste des enceintes
+     * Web connection to the database
+     */
+    private WebConnection webConection;
+
+    /**
+     * Speaker's list
+     */
+    private List<Speaker> listSpeakers;
+    /**
+     * Speaker's listView
      */
     private ListView listViewSpeakers;
 
@@ -43,7 +65,15 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
      */
     private Button bModify = null;
 
-    private int positionListSpeaker = 0;
+    /**
+     * delete button
+     */
+    private Button bDelete = null;
+
+    /**
+     * speaker selected
+     */
+    private Speaker selectedSpeaker = null;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -62,31 +92,16 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
 
         listViewSpeakers = (ListView) findViewById(R.id.listSeakers);
 
-        List<String> listSpeakers = new ArrayList<String>();
+        webConection = new WebConnection();
 
-        listSpeakers.add("Living room bose");
-        listSpeakers.add("Parents room beats");
-        listSpeakers.add("Speaker Kitchen");
-        listSpeakers.add("Speaker Parents room");
-        listSpeakers.add("Speaker Michel room");
-        listSpeakers.add("Speaker Michel bathroom");
-        listSpeakers.add("Speaker Brian room");
-        listSpeakers.add("Speaker Brian bathroom");
-        listSpeakers.add("Speaker Toilette");
-        listSpeakers.add("Speaker Game room");
-        listSpeakers.add("Speaker Pool house");
-        listSpeakers.add("Speaker Party room");
-
-        listViewSpeakers.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, listSpeakers));
-
-        listViewSpeakers.setItemChecked(0, true);
-
-        listViewSpeakers.setOnItemClickListener(this);
+        printList();
 
         bAdd = (Button) findViewById(R.id.newSpeaker);
         bModify = (Button) findViewById(R.id.modificationSpeaker);
+        bDelete = (Button) findViewById(R.id.deleteSpeaker);
         bAdd.setOnClickListener(this);
         bModify.setOnClickListener(this);
+        bDelete.setOnClickListener(this);
 
     }
 
@@ -181,20 +196,41 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
     /**
      * Ouvre l'activité d'ajout d'enceinte
      */
-    private void showNewSpeaker1() {
-        Intent I = new Intent(SpeakersSettingsActivity.this, NewSpeakerActivity.class);
+    private void showNewSpeaker() {
+        Intent I = new Intent(SpeakersSettingsActivity.this, NewSpeakerActivity.class);//NewSpeakerActivity.class);
         startActivity(I);
     }
 
     /**
-     * Ouvre l'activité de modification d'enceinte
+     * Open the activity which modify speaker
      */
     private void showSpeakerModify() {
         Intent I = new Intent(SpeakersSettingsActivity.this, ModifySpeakerActivity.class);
-        ListView speakerName = (ListView) findViewById(R.id.listSeakers);
-        I.putExtra("speakerName", speakerName.getItemAtPosition(positionListSpeaker).toString());
+        Parcelable wrapped = Parcels.wrap(selectedSpeaker);
+        I.putExtra("speaker", wrapped);
     startActivity(I);
 }
+
+    /**
+     * delete selected speaker
+     */
+    private void deleteSpeaker() {
+        final SpeakersSettingsActivity weakCopy = this;
+        webConection.getApi().deleteSpeaker(selectedSpeaker.getId(), new Callback<Speaker>() {
+            @Override
+            public void success(Speaker speaker, Response response) {
+                printList();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
+                dialog.openDialog();
+                printList();
+            }
+        });
+
+    }
 
     /**
      *
@@ -208,11 +244,17 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
         switch (id) {
 
             case R.id.newSpeaker :
-                showNewSpeaker1();
+                showNewSpeaker();
                 break;
+
             case R.id.modificationSpeaker :
                 showSpeakerModify();
                 break;
+
+            case R.id.deleteSpeaker :
+                deleteSpeaker();
+                break;
+
             default:
                 break;
 
@@ -229,6 +271,35 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        positionListSpeaker = position;
+        selectedSpeaker = (Speaker) parent.getItemAtPosition(position);
+    }
+
+    private void printList(){
+        final SpeakersSettingsActivity weakCopy = this;
+        webConection.getApi().getspeakers(new Callback<List<Speaker>>() {
+            @Override
+            public void success(List<Speaker> speakers, Response response) {
+                listSpeakers = speakers;
+                listViewSpeakers.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listSpeakers));
+                listViewSpeakers.setItemChecked(0, true);
+                listViewSpeakers.setOnItemClickListener(weakCopy);
+
+                if (listSpeakers != null) {
+                    if (listSpeakers.get(0) != null)
+                        selectedSpeaker = listSpeakers.get(0);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Retrofit", error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        printList();
     }
 }

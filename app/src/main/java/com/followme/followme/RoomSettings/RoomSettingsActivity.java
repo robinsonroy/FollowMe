@@ -1,8 +1,11 @@
 package com.followme.followme.RoomSettings;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,14 +14,24 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.Room;
 import com.followme.followme.R;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
+import com.followme.followme.View.ErrorDialog;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Robinson on 18/01/15.
@@ -31,9 +44,18 @@ import java.util.List;
 public class RoomSettingsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener{
 
     /**
-     * Liste des pièces connues
+     * Connexion to the web serveur
+     */
+    WebConnection webConection;
+    /**
+     * Liste des vues des pièces connues
      */
     private ListView listViewRooms;
+
+    /**
+     * Liste de pièces
+     */
+    private List<Room> listRooms;
 
     /**
      * Bouton qui permet d'ajouter une pièce.
@@ -53,7 +75,7 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
     /**
      * Posisiton de la room choisi par l'utilisateur dans la ListView
      */
-    int positionListRoom = 0;
+    private Room selectedRoom;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -71,17 +93,9 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
 
         listViewRooms = (ListView) findViewById(R.id.listRooms);
 
-        List<String> listRooms = new ArrayList<String>();
+        webConection = new WebConnection();
 
-        listRooms.add("Kitchen");
-        listRooms.add("Living room");
-        listRooms.add("Parents room");
-
-        listViewRooms.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, listRooms));
-
-        listViewRooms.setItemChecked(0, true);
-
-        listViewRooms.setOnItemClickListener(this);
+        printList();
 
         bAdd = (Button) findViewById(R.id.newRoom);
         bDelete = (Button) findViewById(R.id.deleteRoom);
@@ -192,13 +206,25 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
      */
     private void showModificationRoom() {
         Intent I = new Intent(RoomSettingsActivity.this, ModifyRoomActivity.class);
-        ListView roomName = (ListView) findViewById(R.id.listRooms);
-        I.putExtra("RoomName", roomName.getItemAtPosition(positionListRoom).toString());
+        Parcelable wrapped = Parcels.wrap(selectedRoom);
+        I.putExtra("room", wrapped);
         startActivity(I);
     }
 
     private void deleteRoom() {
-
+        final RoomSettingsActivity weakCopy = this;
+        webConection.getApi().deleteRoom(selectedRoom.getId(), new Callback<Room>(){
+            @Override
+            public void success(Room room, Response response) {
+                printList();
+            }
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
+                dialog.openDialog();
+                printList();
+            }
+        });
     }
 
     /**
@@ -235,6 +261,35 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        positionListRoom = position;
+        selectedRoom = (Room) parent.getItemAtPosition(position);
+    }
+
+    private void printList(){
+        final RoomSettingsActivity weakCopy = this;
+        webConection.getApi().getRooms(new Callback<List<Room>>() {
+            @Override
+            public void success(List<Room> rooms, Response response) {
+                listRooms = rooms;
+                listViewRooms.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listRooms));
+                listViewRooms.setItemChecked(0, true);
+                listViewRooms.setOnItemClickListener(weakCopy);
+
+                if(listRooms != null){
+                    if(listRooms.get(0) != null)
+                        selectedRoom = listRooms.get(0);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Retrofit", error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        printList();
     }
 }

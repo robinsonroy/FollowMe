@@ -1,4 +1,4 @@
-package com.followme.followme.UserSettings;
+package com.followme.followme.SpeakerSettings;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,16 +12,16 @@ import android.widget.Button;
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
-import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
+import com.followme.followme.UserSettings.UsersSettingsActivity;
 
 /**
- * Created by Robinson on 28/01/15.
- * <b>Activité permettant d'ajouter un nouvelle utilisateur</b>
- * Demande la synchronisation entre le bracelet et la box openHab
+ * Created by Robinson on 25/01/15.
+ * <b>Activité qui permet d'ajouter une nouvelle enceinte</b>
+ * Permet la synchronisation entre l'enceinte et la box openHab
  *  @author Robinson
  *  @version 1.0
  */
-public class NewUserActivity extends Activity implements View.OnClickListener{
+public class MessageNewSpeakerActivity extends Activity implements View.OnClickListener{
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -34,15 +34,14 @@ public class NewUserActivity extends Activity implements View.OnClickListener{
      * @see #onCreate(android.os.Bundle)
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_user);
+        setContentView(R.layout.activity_new_speaker_1);
 
         Button bFakeRecognizing ;
         bFakeRecognizing =(Button) findViewById(R.id.fakeRecognizing);
         bFakeRecognizing.setOnClickListener(this);
     }
-
 
     /**
      * Créé le menu
@@ -79,19 +78,20 @@ public class NewUserActivity extends Activity implements View.OnClickListener{
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
         switch (id){
             case R.id.action_my_music :
                 finish();
                 return true;
 
+            case R.id.action_users_settings :
+                finish();
+                showUsersSettings();
+                return true;
+
             case R.id.action_rooms_settings :
                 finish();
                 ShowRoomsSettings();
-                return true;
-
-            case R.id.action_speakers_settings :
-                finish();
-                showSpeakersSettings();
                 return true;
 
             case R.id.action_doors_settings :
@@ -107,18 +107,18 @@ public class NewUserActivity extends Activity implements View.OnClickListener{
     }
 
     /**
-     * Ouvre l'activité de paramétrages des pièces.
+     * Ouvre l'activité de paramétrages des utilisateurs.
      */
-    private void ShowRoomsSettings(){
-        Intent I = new Intent(NewUserActivity.this, RoomSettingsActivity.class);
+    private void showUsersSettings(){
+        Intent I = new Intent(MessageNewSpeakerActivity.this, UsersSettingsActivity.class);
         startActivity(I);
     }
 
     /**
-     * Ouvre l'activité de paramètrages des enceintes.
+     * Ouvre l'activité de paramétrages des pièces.
      */
-    private void showSpeakersSettings() {
-        Intent I = new Intent(NewUserActivity.this, SpeakersSettingsActivity.class);
+    private void ShowRoomsSettings(){
+        Intent I = new Intent(MessageNewSpeakerActivity.this, RoomSettingsActivity.class);
         startActivity(I);
     }
 
@@ -126,15 +126,15 @@ public class NewUserActivity extends Activity implements View.OnClickListener{
      * Ouvre l'activité de paramétrages des capteurs de proximité
      */
     private void showDoorsSettings() {
-        Intent I = new Intent(NewUserActivity.this, DoorsSettingsActivity.class);
+        Intent I = new Intent(MessageNewSpeakerActivity.this, DoorsSettingsActivity.class);
         startActivity(I);
     }
 
     /**
-     * Ouvre l'activité de paramétrage du nom de l'utilisateur
+     * Ouvre l'activité de paramétrage du nom de l'enceinte
      */
-    private void showNewUserSettingName(){
-        Intent I = new Intent(NewUserActivity.this, NewUserSettingName.class);
+    private void showNewSpeakerSettingName() {
+        Intent I = new Intent(MessageNewSpeakerActivity.this, NewSpeakerActivity.class);
         startActivity(I);
     }
 
@@ -145,12 +145,11 @@ public class NewUserActivity extends Activity implements View.OnClickListener{
      */
     @Override
     public void onClick(View v) {
-
         int id = v.getId();
 
         switch (id){
             case R.id.fakeRecognizing :
-                showNewUserSettingName();
+                showNewSpeakerSettingName();
                 break;
             default:
                 break;

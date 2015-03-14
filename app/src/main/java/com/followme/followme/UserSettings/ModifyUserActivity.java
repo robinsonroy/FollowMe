@@ -3,6 +3,7 @@ package com.followme.followme.UserSettings;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -11,9 +12,17 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.User;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
+
+import org.parceler.Parcels;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Robinson on 28/01/15.
@@ -24,9 +33,24 @@ import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 public class ModifyUserActivity extends Activity implements View.OnClickListener{
 
     /**
+     * Connnection with the web server
+     */
+    private WebConnection webConnection;
+
+    /**
      * Bouton permettant de valider la modification
      */
     private Button bValidate = null;
+
+    /**
+     * user to modify
+     */
+    private User user;
+
+    /**
+     * new user name
+     */
+    private EditText editName;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -46,10 +70,13 @@ public class ModifyUserActivity extends Activity implements View.OnClickListener
         bValidate =(Button) findViewById(R.id.validSettingName);
         bValidate.setOnClickListener(this);
 
+        Intent i = getIntent();
+        user = Parcels.unwrap(i.getParcelableExtra("user"));
+        editName = (EditText) findViewById(R.id.userName);
+        editName.setText(user.toString());
+        //editName.setHint(user.toString());
 
-        String value = getIntent().getStringExtra("UserName");
-        EditText userName = (EditText) findViewById(R.id.userName);
-        userName.setHint(value);
+        webConnection = new WebConnection();
     }
 
 
@@ -139,6 +166,26 @@ public class ModifyUserActivity extends Activity implements View.OnClickListener
         startActivity(I);
     }
 
+    private void saveModification(){
+
+        editName = (EditText) findViewById(R.id.userName);
+
+        user.setName(editName.getText().toString());
+
+        webConnection.getApi().postUser(user, new Callback<User>() {
+            @Override
+            public void success(User user, Response response) {
+                finish();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                //dialog
+                finish();
+            }
+        });
+    }
+
     /**
      *
      * @param v
@@ -150,7 +197,7 @@ public class ModifyUserActivity extends Activity implements View.OnClickListener
 
         switch (id){
             case R.id.validSettingName :
-                finish();
+                saveModification();
                 break;
             default:
                 break;

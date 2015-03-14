@@ -3,29 +3,66 @@ package com.followme.followme.SpeakerSettings;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.Room;
+import com.followme.followme.Model.Speaker;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
+import com.followme.followme.UserSettings.NewUserSettingName;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
+import com.followme.followme.View.ErrorFinishDialog;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Robinson on 25/01/15.
- * <b>Activité qui permet d'ajouter une nouvelle enceinte</b>
- * Permet la synchronisation entre l'enceinte et la box openHab
+ * <b>Activité qui permet de donner un nom à une nouvelle enceinte</b>
  *  @author Robinson
  *  @version 1.0
  */
-public class NewSpeakerActivity extends Activity implements View.OnClickListener{
+public class NewSpeakerActivity extends Activity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+
+    /**
+     * Validate bouton
+     */
+    private Button bValidate = null;
+
+    /**
+     * Web connectioon to the database
+     */
+    private WebConnection webConnection;
+
+    /**
+     * the list of rooms
+     */
+    private List<Room> listRoom;
+
+    /**
+     * room choose with spinner
+     */
+    private Room speakerRoom;
+
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
-     *
+     *  Affiche la liste des pièces et un EditText du nom du speaker
      *
      * @param savedInstanceState If the activity is being re-initialized after
      *     previously being shut down then this Bundle contains the data it most
@@ -33,14 +70,16 @@ public class NewSpeakerActivity extends Activity implements View.OnClickListener
      *
      * @see #onCreate(android.os.Bundle)
      */
-    @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_speaker_1);
+        setContentView(R.layout.activity_new_speaker_setting_name);
 
-        Button bFakeRecognizing ;
-        bFakeRecognizing =(Button) findViewById(R.id.fakeRecognizing);
-        bFakeRecognizing.setOnClickListener(this);
+        bValidate =(Button) findViewById(R.id.validSettingName);
+        bValidate.setOnClickListener(this);
+
+        webConnection = new WebConnection();
+
+        printSpinner();
     }
 
     /**
@@ -131,11 +170,39 @@ public class NewSpeakerActivity extends Activity implements View.OnClickListener
     }
 
     /**
-     * Ouvre l'activité de paramétrage du nom de l'enceinte
+     * Ouvre l'activité de paramétrage wifi de l'enceinte.
      */
-    private void showNewSpeakerSettingName() {
-        Intent I = new Intent(NewSpeakerActivity.this, NewSpeakerSettingName.class);
+    private void showSpeakerWifiConnection(){
+        Intent I = new Intent(NewSpeakerActivity.this, SpeakerWifiConnectionActivity.class);
         startActivity(I);
+    }
+
+    private void addNewSpeaker(){
+        Speaker speaker = new Speaker();
+
+        EditText editName =(EditText) findViewById(R.id.speakerName);
+
+        speaker.setName(editName.getText().toString());
+
+        speaker.setRoom(speakerRoom);
+
+        final NewSpeakerActivity weakCopy = this;
+        webConnection.getApi().putSpeaker(speaker, new Callback<Speaker>() {
+            @Override
+            public void success(Speaker speaker, Response response) {
+                finish();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                ErrorFinishDialog dialog = new ErrorFinishDialog("Impossible to add speaker", "ok", weakCopy);
+                dialog.openDialog();
+            }
+        });
+
+
+
+
     }
 
     /**
@@ -148,11 +215,61 @@ public class NewSpeakerActivity extends Activity implements View.OnClickListener
         int id = v.getId();
 
         switch (id){
-            case R.id.fakeRecognizing :
-                showNewSpeakerSettingName();
+            case R.id.validSettingName :
+                //showSpeakerWifiConnection();
+                addNewSpeaker();
                 break;
             default:
                 break;
         }
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+
+        speakerRoom = listRoom.get(pos);
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+    }
+
+    private void printSpinner(){
+        final NewSpeakerActivity weakCopy = this;
+        webConnection.getApi().getRooms(new Callback<List<Room>>() {
+            @Override
+            public void success(List<Room> rooms, Response response) {
+
+                listRoom = rooms;
+
+                List<String> listStringRoom = new ArrayList<>();
+
+                for(int i = 0 ; i < rooms.size(); i++){
+                    listStringRoom.add(rooms.get(i).toString());
+                }
+
+                Spinner spinner = (Spinner) findViewById(R.id.speakerRoom);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(weakCopy,
+                        android.R.layout.simple_spinner_item, listStringRoom);
+
+                // Drop down layout style - list view
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                // dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                if(rooms != null){
+                    if(rooms.get(0) != null)
+                        speakerRoom = rooms.get(0);
+                }
+
+
+                // attaching data adapter to spinner
+                spinner.setAdapter(adapter);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Retrofit", error.getMessage());
+            }
+        });
     }
 }

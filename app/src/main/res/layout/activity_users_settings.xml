@@ -8,12 +8,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="User settings activity"
-            android:layout_centerHorizontal="true"/>
-
         <ListView
             android:id="@+id/listUsers"
             android:layout_width="fill_parent"
@@ -29,6 +23,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true">
+
+            <Button
+                android:id="@+id/deleteUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delete"/>
 
             <Button
                 android:id="@+id/modificationUser"

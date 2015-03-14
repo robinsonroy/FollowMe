@@ -8,11 +8,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.User;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
+import com.followme.followme.View.ErrorFinishDialog;
+
+import java.util.Random;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 
 /**
@@ -27,6 +37,11 @@ public class NewUserSettingName extends Activity implements View.OnClickListener
      * Bouton permettant de valider le nom de l'utilisateur
      */
     private Button bValidate = null;
+
+    /**
+     * webconnection
+     */
+    private WebConnection webConnection;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -133,6 +148,35 @@ public class NewUserSettingName extends Activity implements View.OnClickListener
         startActivity(I);
     }
 
+    private void addNewUser(){
+
+        User user = new User();
+
+        EditText editText =(EditText) findViewById(R.id.userName);
+
+        user.setName(editText.getText().toString());
+        Random rand = new Random();
+        user.setBraceletID(rand.nextInt(200 - 1) + 1);
+
+        final NewUserSettingName weakCopy = this;
+
+        webConnection = new WebConnection();
+        webConnection.getApi().putUser(user, new Callback<User>() {
+            @Override
+            public void success(User user, Response response) {
+                finish();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                ErrorFinishDialog dialog = new ErrorFinishDialog("Impossible to add new user", "OK", weakCopy);
+                dialog.openDialog();
+            }
+        });
+    }
+
+
+
     /**
      *
      * @param v
@@ -144,6 +188,7 @@ public class NewUserSettingName extends Activity implements View.OnClickListener
 
         switch (id){
             case R.id.validSettingName :
+                addNewUser();
                 break;
             default:
                 break;

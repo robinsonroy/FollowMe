@@ -1,16 +1,30 @@
 package com.followme.followme;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.Http.ApiService;
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.Room;
+import com.followme.followme.Model.Test;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
+
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Robinson on 18/01/15.
@@ -20,7 +34,7 @@ import com.followme.followme.UserSettings.UsersSettingsActivity;
  *  @author Robinson
  *  @version 1.0
  */
-public class MyMusicActivity extends ActionBarActivity {
+public class MyMusicActivity extends Activity {
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -35,6 +49,8 @@ public class MyMusicActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_music);
+
+        printTest();
     }
 
     /**
@@ -128,5 +144,16 @@ public class MyMusicActivity extends ActionBarActivity {
         Intent I = new Intent(MyMusicActivity.this, DoorsSettingsActivity.class);
         startActivity(I);
     }
-}
 
+    private void printTest(){
+        try{
+            WebConnection web = new WebConnection();
+
+            final MyMusicActivity weakCopy = this;
+            //get music
+
+        }catch (RetrofitError e){
+            Log.d("retrofit", "" + e.getResponse().getStatus());
+        }
+    }
+}

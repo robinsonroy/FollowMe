@@ -15,6 +15,7 @@ public class Room {
     @SerializedName("name")
     private String name;
 
+
     public void setId(int id) {
         this.id = id;
     }
@@ -30,4 +31,10 @@ public class Room {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return name ;
+    }
+
 }

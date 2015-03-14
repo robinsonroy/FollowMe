@@ -1,8 +1,11 @@
 package com.followme.followme.UserSettings;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,12 +16,21 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.User;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
+import com.followme.followme.View.ErrorDialog;
+import com.followme.followme.View.ErrorFinishDialog;
 
-import java.util.ArrayList;
+import org.parceler.Parcels;
+
 import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Robinson on 18/01/15.
@@ -30,9 +42,20 @@ import java.util.List;
 public class UsersSettingsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener{
 
     /**
-     * Liste des utilisateurs
+     * Web connection to the database
+     */
+    private WebConnection webConection;
+
+    /**
+     * List view of users
      */
     private ListView listViewUsers;
+
+    /**
+     * users list
+     */
+    private List<User> listUsers;
+
 
     /**
      * Bouton d'ajout d'un utilisateur
@@ -45,9 +68,14 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     private Button bModify = null;
 
     /**
+     * Button to delete an user
+     */
+    private Button bDelete = null;
+
+    /**
      * position de l'utilsateur selection dans la ListView listViewUsers
      */
-    private int positionListUser = 0;
+    private User selectedUser = null;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -66,22 +94,14 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
 
         listViewUsers = (ListView) findViewById(R.id.listUsers);
 
-        List<String> listUsers = new ArrayList<String>();
+        webConection = new WebConnection();
 
-        listUsers.add("Flavio");
-        listUsers.add("Mathieu");
-        listUsers.add("Nicos");
-        listUsers.add("Rom");
-        listUsers.add("Robinson");
-
-        listViewUsers.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, listUsers));
-
-        listViewUsers.setItemChecked(0, true);
-
-        listViewUsers.setOnItemClickListener(this);
+        printList();
 
         bAdd = (Button) findViewById(R.id.newUser);
         bModify = (Button) findViewById(R.id.modificationUser);
+        bDelete = (Button) findViewById(R.id.deleteUser);
+        bDelete.setOnClickListener(this);
         bAdd.setOnClickListener(this);
         bModify.setOnClickListener(this);
     }
@@ -177,18 +197,39 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
      * Ouvre l'activité d'ajout d'utilisateur.
      */
     private void showNewUser() {
-        Intent I = new Intent(UsersSettingsActivity.this, NewUserActivity.class);
+        Intent I = new Intent(UsersSettingsActivity.this, BraceletSyncActivity.class);
         startActivity(I);
     }
 
     /**
-     * Ouvre l'activtié de modification d'un utilisateur.
+     * Open the activity which modify speaker
      */
     private void showUserModify() {
         Intent I = new Intent(UsersSettingsActivity.this, ModifyUserActivity.class);
-        ListView userName = (ListView) findViewById(R.id.listUsers);
-        I.putExtra("UserName", userName.getItemAtPosition(positionListUser).toString());
+        Parcelable wrapped = Parcels.wrap(selectedUser);
+        I.putExtra("user", wrapped);
         startActivity(I);
+    }
+
+    /**
+     * delete selected user
+     */
+    private void deleteUser() {
+        final UsersSettingsActivity weakCopy = this;
+        webConection.getApi().deleteUser(selectedUser.getId(), new Callback<User>() {
+            @Override
+            public void success(User user, Response response) {
+                printList();
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
+                dialog.openDialog();
+                printList();
+            }
+        });
     }
 
     /**
@@ -208,10 +249,33 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
             case R.id.modificationUser :
                 showUserModify();
                 break;
+            case R.id.deleteUser :
+                deleteUser();
             default:
                 break;
 
         }
+    }
+
+    /**
+     * method to print user listView
+     */
+    private void printList(){
+        final UsersSettingsActivity weakCopy = this;
+        webConection.getApi().getUsers(new Callback<List<User>>() {
+            @Override
+            public void success(List<User> users, Response response) {
+                listUsers = users;
+                listViewUsers.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listUsers));
+                listViewUsers.setItemChecked(0, true);
+                listViewUsers.setOnItemClickListener(weakCopy);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Retrofit", error.getMessage());
+            }
+        });
     }
 
     /**
@@ -224,6 +288,15 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        positionListUser = position;
+        selectedUser = (User) parent.getItemAtPosition(position);
+    }
+
+    /**
+     * Methode to refresh listView when the activity is resume
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        printList();
     }
 }

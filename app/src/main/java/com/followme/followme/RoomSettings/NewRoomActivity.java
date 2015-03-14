@@ -3,21 +3,32 @@ package com.followme.followme.RoomSettings;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.Room;
 import com.followme.followme.R;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
+import com.followme.followme.View.ErrorFinishDialog;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Robinson on 18/01/15.
@@ -141,7 +152,28 @@ public class NewRoomActivity extends Activity implements View.OnClickListener{
 
 
     private void addNewRooom(){
-        finish();
+        Room newRoom = new Room();
+
+        EditText editText =(EditText) findViewById(R.id.roomName);
+        String name = editText.getText().toString();
+
+        newRoom.setName(name);
+
+        WebConnection webConnection = new WebConnection();
+
+        final NewRoomActivity weakCopy = this;
+        webConnection.getApi().putRoom(newRoom, new Callback<Room>() {
+            @Override
+            public void success(Room room, Response response) {
+
+            }
+            @Override
+            public void failure(RetrofitError retrofitError) {
+                ErrorFinishDialog dialog = new ErrorFinishDialog("Impossible to add Room", "ok", weakCopy);
+                dialog.openDialog();
+
+            }
+        });
     }
 
     /**
@@ -156,6 +188,7 @@ public class NewRoomActivity extends Activity implements View.OnClickListener{
         switch (id){
             case R.id.validSettingName :
                 addNewRooom();
+                finish();
                 break;
         }
     }

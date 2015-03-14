@@ -9,6 +9,7 @@ import org.parceler.Parcel;
  */
 @Parcel
 public class RFSensor {
+
     @SerializedName("id")
     private int id;
     @SerializedName("room")

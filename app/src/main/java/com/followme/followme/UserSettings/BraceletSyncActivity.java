@@ -1,4 +1,4 @@
-package com.followme.followme.SpeakerSettings;
+package com.followme.followme.UserSettings;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,34 +7,25 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
-import com.followme.followme.UserSettings.UsersSettingsActivity;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 
 /**
- * Created by Robinson on 25/01/15.
- * <b>Activité qui permet de donner un nom à une nouvelle enceinte</b>
+ * Created by Robinson on 28/01/15.
+ * <b>Activité permettant d'ajouter un nouvelle utilisateur</b>
+ * Demande la synchronisation entre le bracelet et la box openHab
  *  @author Robinson
  *  @version 1.0
  */
-public class NewSpeakerSettingName extends Activity implements View.OnClickListener {
-
-    /**
-     *
-     */
-    private Button bValidate = null;
+public class BraceletSyncActivity extends Activity implements View.OnClickListener{
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
-     *  Affiche la liste des pièces et un EditText du nom du speaker
+     *
      *
      * @param savedInstanceState If the activity is being re-initialized after
      *     previously being shut down then this Bundle contains the data it most
@@ -42,31 +33,16 @@ public class NewSpeakerSettingName extends Activity implements View.OnClickListe
      *
      * @see #onCreate(android.os.Bundle)
      */
-    protected void onCreate(Bundle savedInstanceState)  {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_speaker_setting_name);
+        setContentView(R.layout.activity_new_user);
 
-        bValidate =(Button) findViewById(R.id.validSettingName);
-        bValidate.setOnClickListener(this);
-
-        Spinner spinner = (Spinner) findViewById(R.id.speakerRoom);
-
-        List<String> rooms = new ArrayList<>();
-
-        rooms.add("Living room");
-        rooms.add("Kitchen");
-        rooms.add("Parents room");
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, rooms);
-
-        // Drop down layout style - list view
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // attaching data adapter to spinner
-        spinner.setAdapter(dataAdapter);
+        Button bFakeRecognizing ;
+        bFakeRecognizing =(Button) findViewById(R.id.fakeRecognizing);
+        bFakeRecognizing.setOnClickListener(this);
     }
+
 
     /**
      * Créé le menu
@@ -103,20 +79,19 @@ public class NewSpeakerSettingName extends Activity implements View.OnClickListe
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         switch (id){
             case R.id.action_my_music :
                 finish();
                 return true;
 
-            case R.id.action_users_settings :
-                finish();
-                showUsersSettings();
-                return true;
-
             case R.id.action_rooms_settings :
                 finish();
                 ShowRoomsSettings();
+                return true;
+
+            case R.id.action_speakers_settings :
+                finish();
+                showSpeakersSettings();
                 return true;
 
             case R.id.action_doors_settings :
@@ -132,18 +107,18 @@ public class NewSpeakerSettingName extends Activity implements View.OnClickListe
     }
 
     /**
-     * Ouvre l'activité de paramétrages des utilisateurs.
+     * Ouvre l'activité de paramétrages des pièces.
      */
-    private void showUsersSettings(){
-        Intent I = new Intent(NewSpeakerSettingName.this, UsersSettingsActivity.class);
+    private void ShowRoomsSettings(){
+        Intent I = new Intent(BraceletSyncActivity.this, RoomSettingsActivity.class);
         startActivity(I);
     }
 
     /**
-     * Ouvre l'activité de paramétrages des pièces.
+     * Ouvre l'activité de paramètrages des enceintes.
      */
-    private void ShowRoomsSettings(){
-        Intent I = new Intent(NewSpeakerSettingName.this, RoomSettingsActivity.class);
+    private void showSpeakersSettings() {
+        Intent I = new Intent(BraceletSyncActivity.this, SpeakersSettingsActivity.class);
         startActivity(I);
     }
 
@@ -151,15 +126,15 @@ public class NewSpeakerSettingName extends Activity implements View.OnClickListe
      * Ouvre l'activité de paramétrages des capteurs de proximité
      */
     private void showDoorsSettings() {
-        Intent I = new Intent(NewSpeakerSettingName.this, DoorsSettingsActivity.class);
+        Intent I = new Intent(BraceletSyncActivity.this, DoorsSettingsActivity.class);
         startActivity(I);
     }
 
     /**
-     * Ouvre l'activité de paramétrage wifi de l'enceinte.
+     * Ouvre l'activité de paramétrage du nom de l'utilisateur
      */
-    private void showSpeakerWifiConnection(){
-        Intent I = new Intent(NewSpeakerSettingName.this, SpeakerWifiConnectionActivity.class);
+    private void showNewUserSettingName(){
+        Intent I = new Intent(BraceletSyncActivity.this, NewUserSettingName.class);
         startActivity(I);
     }
 
@@ -170,11 +145,12 @@ public class NewSpeakerSettingName extends Activity implements View.OnClickListe
      */
     @Override
     public void onClick(View v) {
+
         int id = v.getId();
 
         switch (id){
-            case R.id.validSettingName :
-                showSpeakerWifiConnection();
+            case R.id.fakeRecognizing :
+                showNewUserSettingName();
                 break;
             default:
                 break;

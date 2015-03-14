@@ -3,6 +3,7 @@ package com.followme.followme.Http;
 import com.followme.followme.Model.Door;
 import com.followme.followme.Model.Room;
 import com.followme.followme.Model.Speaker;
+import com.followme.followme.Model.Test;
 import com.followme.followme.Model.User;
 
 import java.util.List;
@@ -11,11 +12,9 @@ import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
-import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
-import retrofit.http.Query;
 
 /**
  * Created by Robinson on 11/02/15.
@@ -27,87 +26,90 @@ public interface ApiService {
 
     //@Header("Cache-Control: This is an awesome header")
 
+
     /**
-     * Get all rooms
-     * @return list of room
+     *
+     * @param cb
+     *      Callback
      */
-    @GET("/api/rooms")
-    public List<Room> getRooms();
+    @GET("/api/rooms")///api/rooms")
+    public void getRooms(Callback<List<Room>> cb);
 
     /**
      * Get a room with an id
      *
      * @param id
-     * @return room
-     */
-    @GET("/api/rooms/{id}")
-    public Room getRoom(@Path("id") Integer id); //, @Query("test") String strTest);
-
-    /**
-     * Post a room
-     *
-     * @param room
-     *          Room to post
-     * @param b
-     *      Callback
-     * @return room
-     */
-    @POST("/api/rooms")
-    public Room postRoom(@Body Room room, Callback<Room> b);
-
-    /**
-     * Put a room
-     *
-     * @param room
-     *          Room to put
+     *       room id
      * @param cb
-     *       Callback
-     * @return room put
+     *        Callaback
      */
-    @PUT("/api/rooms")
-    public Room putRoom(@Body Room room, Callback<Room> cb);
+    @GET("/api/room/{id}")
+    public void getRoom(@Path("id") Integer id, Callback<Room> cb); //, @Query("test") String strTest);
 
     /**
-     * Delete room with an id
-     * @param id
-     *       id of room delete
-     * @return true if delete ok, false else
+     * Modify aroom
+     *
+     * @param room
+     *          Room to modify
+     * @param cb
+     *        Callback
+     * @return
      */
-    @DELETE("/api/rooms/{id}")
-    public boolean deleteRoom(@Path("id") Integer id);
+    @POST("/api/room")
+    public void postRoom(@Body Room room, Callback<Room> cb);
+
+    /**
+     *
+     * put a new room
+     *
+     * @param newRoom
+     *              Room to add
+     * @param cb
+     *          callback
+     */
+    @PUT("/api/room")
+    public void putRoom(@Body Room newRoom, Callback<Room> cb);
+
+    /**
+     * Delete a room
+     * @param id
+     *         room id
+     * @param cb
+     *         Callback
+     */
+    @DELETE("/api/room/{id}")
+    public void deleteRoom(@Path("id") Integer id, Callback<Room> cb);
 
 
     /// ----  User  ----  ///
 
-
     /**
-     * Get all users
-     * @return list of user
+     * get all users
+     * @param cb
+     *          callback with the user list
      */
     @GET("/api/users")
-    public List<User> getUsers();
+    public void getUsers(Callback<List<User>> cb);
 
     /**
-     * Get an user with an id
-     *
+     * Get an user with id
      * @param id
-     *       id of user
-     * @return user
+     *       user id
+     * @param cb
+     *       Callback
      */
-    @GET("/api/users/{id}")
-    public User getUser(@Path("id") Integer id);
+    @GET("/api/user/{id}")
+    public void getUser(@Path("id") Integer id, Callback<User> cb);
 
     /**
-     * Post an user
-     *
+     * modify user
      * @param user
-     *          user to post
-     * @param b
+     *      new user information
+     * @param cb
      *      Callback
-     * @return user
      */
-    @POST("/api/users")
-    public User postUser(@Body User user, Callback<User> b);
+    @POST("/api/user")
+    public void postUser(@Body User user, Callback<User> cb);
 
     /**
      * Put an user
@@ -116,52 +118,49 @@ public interface ApiService {
      *          user to put
      * @param cb
      *       Callback
-     * @return user put
      */
-    @PUT("/api/users")
-    public User putUser(@Body User user, Callback<Room> cb);
+    @PUT("/api/user")
+    public void putUser(@Body User user, Callback<User> cb);
 
     /**
-     * Delete user with an id
+     * Delete an user
      * @param id
-     *       id of user delete
-     * @return true if delete ok, false else
+     *      user id
+     * @param cb
+     *       Callback
      */
-    @DELETE("/api/users/{id}")
-    public boolean deleteUser(@Path("id") Integer id);
+    @DELETE("/api/user/{id}")
+    public void deleteUser(@Path("id") Integer id, Callback<User> cb);
 
 
 
     /// ----  Speaker  ----  ///
 
     /**
-     * Get all speakers
-     * @return list of speaker
+     * Get all rooms
      */
     @GET("/api/speakers")
-    public List<Speaker> getSpeakers();
+    public void getspeakers(Callback<List<Speaker>> cb);
 
     /**
-     * Get a speaker with an id
-     *
+     ** Get a speaker with an id
      * @param id
      *       id of speaker
-     * @return speaker
+     * @param cb
      */
     @GET("/api/speaker/{id}")
-    public Speaker getSpeaker(@Path("id") Integer id);
+    public void getSpeaker(@Path("id") Integer id, Callback<Speaker> cb);
 
     /**
      * Post a speaker
      *
      * @param speaker
      *          speaker to post
-     * @param b
+     * @param cb
      *      Callback
-     * @return speaker
      */
-    @POST("/api/speakers")
-    public Speaker postSpeaker(@Body Speaker speaker, Callback<User> b);
+    @POST("/api/speaker")
+    public void postSpeaker(@Body Speaker speaker, Callback<Speaker> cb);
 
     /**
      * Put a speaker
@@ -169,23 +168,20 @@ public interface ApiService {
      * @param speaker
      *          speaker to put
      * @param cb
-     *       Callback
-     * @return speaker put
+     *      Callback
      */
-    @PUT("/api/speakers")
-    public Speaker putSpeaker(@Body Speaker speaker, Callback<Room> cb);
+    @PUT("/api/speaker")
+    public void putSpeaker(@Body Speaker speaker, Callback<Speaker> cb);
 
     /**
      * Delete speaker with an id
      * @param id
      *       id of speaker delete
-     * @return true if delete ok, false else
+     * @param cb
+     *      Callback
      */
-    @DELETE("/api/speakers/{id}")
-    public boolean deleteSpeaker(@Path("id") Integer id);
-
-
-
+    @DELETE("/api/speaker/{id}")
+    public void deleteSpeaker(@Path("id") Integer id, Callback<Speaker> cb);
 
     /// ----  Door  ----  ///
 
@@ -194,29 +190,29 @@ public interface ApiService {
      * @return list of door
      */
     @GET("/api/doors")
-    public List<Door> getDoors();
+    public void getDoors(Callback<List<Door>> cb);
 
     /**
      * Get a door with an id
      *
      * @param id
      *       id of door
-     * @return door
+     * @param cb
+     *      Callback
      */
-    @GET("/api/doors/{id}")
-    public Door getDoor(@Path("id") Integer id);
+    @GET("/api/door/{id}")
+    public void getDoor(@Path("id") Integer id, Callback<Door> cb);
 
     /**
      * Post a door
      *
      * @param door
      *          door to post
-     * @param b
+     * @param cb
      *      Callback
-     * @return door
      */
-    @POST("/api/doors")
-    public Door postDoor(@Body Door door, Callback<User> b);
+    @POST("/api/door")
+    public void postDoor(@Body Door door, Callback<Door> cb);
 
     /**
      * Put a door
@@ -225,19 +221,19 @@ public interface ApiService {
      *          door to put
      * @param cb
      *       Callback
-     * @return door put
      */
-    @PUT("/api/doors")
-    public Door putDoor(@Body Door door, Callback<Room> cb);
+    @PUT("/api/door")
+    public void putDoor(@Body Door door, Callback<Room> cb);
 
     /**
      * Delete door with an id
      * @param id
-     *       id of door delete
-     * @return true if delete ok, false else
+     *         door id
+     * @param cb
+     *       Callback
      */
     @DELETE("/api/doors/{id}")
-    public boolean deleteDoor(@Path("id") Integer id);
+    public void deleteDoor(@Path("id") Integer id, Callback<Room> cb);
 
 
 

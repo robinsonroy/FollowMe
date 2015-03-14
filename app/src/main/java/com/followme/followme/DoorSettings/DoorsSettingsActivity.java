@@ -5,18 +5,28 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.Door;
+import com.followme.followme.Model.Room;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
+import com.followme.followme.View.ErrorDialog;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by Robinson on 04/02/15.
@@ -24,12 +34,26 @@ import com.followme.followme.UserSettings.UsersSettingsActivity;
  *  @author Robinson
  *  @version 1.0
  */
-public class DoorsSettingsActivity extends Activity implements View.OnClickListener {
+public class DoorsSettingsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     /**
      * Liste des portes connues
      */
     private ListView listViewDoors;
+
+    /**
+     * List of all door
+     */
+    private List<Door> listDoors;
+    /**
+     * Door selected by the user
+     */
+    private Door selectedDoor;
+
+    /**
+     * web connection with the database
+     */
+    private WebConnection webConnection;
 
     /**
      * Bouton qui permet d'ajouter une porte.
@@ -57,17 +81,10 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doors_settings);
 
+        webConnection = new WebConnection();
         listViewDoors = (ListView) findViewById(R.id.listDoors);
 
-        List<String> listDoors = new ArrayList<String>();
-
-        listDoors.add("Door Kitchen - Living Room");
-        listDoors.add("Door Living Room - Parents Room");
-        listDoors.add("Door Kitchen - Corridor");
-
-        listViewDoors.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, listDoors));
-
-        listViewDoors.setItemChecked(0, true);
+        printList();
 
         bAdd = (Button) findViewById(R.id.newDoor);
         bDelete = (Button) findViewById(R.id.deleteDoor);
@@ -176,7 +193,20 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
      * Supprime une porte (2 capteurs de proximité).
      */
     private void deleteDoor() {
-        //Delete door
+        final DoorsSettingsActivity weakCopy = this;
+        webConnection.getApi().deleteDoor(selectedDoor.getId(), new Callback<Room>() {
+            @Override
+            public void success(Room room, Response response) {
+                printList();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
+                dialog.openDialog();
+                printList();
+            }
+        });
     }
 
     /**
@@ -200,5 +230,42 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
                 break;
 
         }
+    }
+
+    private void printList(){
+        final DoorsSettingsActivity weakCopy = this;
+        webConnection.getApi().getDoors(new Callback<List<Door>>() {
+            @Override
+            public void success(List<Door> doors, Response response) {
+                listDoors = doors;
+                listViewDoors.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listDoors));
+                listViewDoors.setItemChecked(0, true);
+                listViewDoors.setOnItemClickListener(weakCopy);
+                Log.d("doors", doors.toString());
+
+                if (listDoors != null) {
+                    if (listDoors.get(0) != null)
+                        selectedDoor = listDoors.get(0);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d("Retrofit", error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        selectedDoor = (Door) parent.getItemAtPosition(position);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        printList();
     }
 }
