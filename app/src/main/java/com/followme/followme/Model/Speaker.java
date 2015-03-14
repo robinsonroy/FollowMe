@@ -19,6 +19,9 @@ public class Speaker {
     @SerializedName("room")
     private Room room;
 
+    @SerializedName("IP")
+    private String IP;
+
     public int getId() {
         return id;
     }
@@ -46,5 +49,9 @@ public class Speaker {
     @Override
     public String toString() {
         return  name;
+    }
+
+    public void setIP(String IP) {
+        this.IP = IP;
     }
 }

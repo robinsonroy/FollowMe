@@ -19,6 +19,15 @@
             android:hint="@string/speakerName"
             />
 
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="30dp"
+            android:id="@+id/speakerIP"
+            android:hint="@string/speakerIP"
+            />
+
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

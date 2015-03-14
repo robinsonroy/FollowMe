@@ -65,7 +65,7 @@
             android:label="@string/app_name">
         </activity>
         <activity
-            android:name=".DoorSettings.SensorChooseRoomActivity"
+            android:name=".DoorSettings.SensorAddActivity"
             android:label="@string/app_name">
         </activity>
         <activity

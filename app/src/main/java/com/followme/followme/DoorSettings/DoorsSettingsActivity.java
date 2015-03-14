@@ -1,6 +1,5 @@
 package com.followme.followme.DoorSettings;
 
-import java.util.ArrayList;
 import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
@@ -184,8 +183,7 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
      * Ouvre l'activité de paramètrages des capteurs de proximité
      */
     private void showNewSensor1() {
-        Intent I = new Intent(DoorsSettingsActivity.this, SensorChooseRoomActivity.class);
-        I.putExtra("sensorNum", "1");
+        Intent I = new Intent(DoorsSettingsActivity.this, SensorAddActivity.class);
         startActivity(I);
     }
 

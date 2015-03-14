@@ -232,7 +232,7 @@ public interface ApiService {
      * @param cb
      *       Callback
      */
-    @DELETE("/api/doors/{id}")
+    @DELETE("/api/door/{id}")
     public void deleteDoor(@Path("id") Integer id, Callback<Room> cb);
 
 

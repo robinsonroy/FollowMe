@@ -11,6 +11,15 @@
         android:layout_centerVertical="true">
 
         <EditText
+            android:id="@+id/braceletID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="30dp"
+            android:hint="@string/braceletID"
+            />
+
+        <EditText
             android:id="@+id/userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -15,7 +15,7 @@ public class User {
     @SerializedName("name")
     private String name;
     @SerializedName("braceletID")
-    private int braceletID;
+    private long braceletID;
 
     @Override
     public String toString() {
@@ -38,11 +38,11 @@ public class User {
         this.name = name;
     }
 
-    public int getBraceletID() {
+    public long getBraceletID() {
         return braceletID;
     }
 
-    public void setBraceletID(int braceletID) {
+    public void setBraceletID(long braceletID) {
         this.braceletID = braceletID;
     }
 }

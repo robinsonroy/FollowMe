@@ -146,7 +146,7 @@ public class SensorWaitSyncActivity extends Activity implements View.OnClickList
      */
     private void syncOk() {
         if(sensorNum == 1){
-            Intent I = new Intent(SensorWaitSyncActivity.this, SensorChooseRoomActivity.class);
+            Intent I = new Intent(SensorWaitSyncActivity.this, SensorAddActivity.class);
             I.putExtra("sensorNum", "2");
             startActivity(I);
         }else if(sensorNum == 2){

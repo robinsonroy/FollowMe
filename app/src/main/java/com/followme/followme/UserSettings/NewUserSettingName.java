@@ -152,11 +152,11 @@ public class NewUserSettingName extends Activity implements View.OnClickListener
 
         User user = new User();
 
-        EditText editText =(EditText) findViewById(R.id.userName);
+        EditText editName =(EditText) findViewById(R.id.userName);
+        EditText editBraceletID = (EditText) findViewById(R.id.braceletID);
 
-        user.setName(editText.getText().toString());
-        Random rand = new Random();
-        user.setBraceletID(rand.nextInt(200 - 1) + 1);
+        user.setName(editName.getText().toString());
+        user.setBraceletID(Long.parseLong(editBraceletID.getText().toString()));
 
         final NewUserSettingName weakCopy = this;
 

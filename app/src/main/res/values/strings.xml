@@ -26,4 +26,7 @@
     <string name="synchroMessage">Please wait for synchronisation with the SmartBox</string>
     <string name="roomName">Room name</string>
     <string name="errorConnection">Connection to the database impossible</string>
+    <string name="sensorSerial">Sensor serial number</string>
+    <string name="braceletID">Bracelet ID</string>
+    <string name="speakerIP">IP Address</string>
 </resources>

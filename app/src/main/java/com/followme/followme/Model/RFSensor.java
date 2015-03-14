@@ -11,15 +11,15 @@ import org.parceler.Parcel;
 public class RFSensor {
 
     @SerializedName("id")
-    private int id;
+    private long id;
     @SerializedName("room")
     private Room room;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

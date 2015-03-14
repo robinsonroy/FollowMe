@@ -181,8 +181,10 @@ public class NewSpeakerActivity extends Activity implements View.OnClickListener
         Speaker speaker = new Speaker();
 
         EditText editName =(EditText) findViewById(R.id.speakerName);
+        EditText editIP = (EditText) findViewById(R.id.speakerIP);
 
         speaker.setName(editName.getText().toString());
+        speaker.setIP(editIP.getText().toString());
 
         speaker.setRoom(speakerRoom);
 
@@ -242,7 +244,7 @@ public class NewSpeakerActivity extends Activity implements View.OnClickListener
 
                 listRoom = rooms;
 
-                List<String> listStringRoom = new ArrayList<>();
+                List<String> listStringRoom = new ArrayList<String>();
 
                 for(int i = 0 ; i < rooms.size(); i++){
                     listStringRoom.add(rooms.get(i).toString());
@@ -264,6 +266,7 @@ public class NewSpeakerActivity extends Activity implements View.OnClickListener
 
                 // attaching data adapter to spinner
                 spinner.setAdapter(adapter);
+                spinner.setOnItemSelectedListener(weakCopy);
             }
 
             @Override

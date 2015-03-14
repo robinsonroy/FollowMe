@@ -3,17 +3,21 @@ package com.followme.followme.UserSettings;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.Http.WebConnection;
@@ -39,7 +43,12 @@ import retrofit.client.Response;
  *  @author Robinson
  *  @version 1.0
  */
-public class UsersSettingsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener{
+public class UsersSettingsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, android.widget.AdapterView.OnItemLongClickListener{
+
+    /**
+     * Tag to save main user in share preference
+     */
+    public final static String MAIN_USER = "main user name";
 
     /**
      * Web connection to the database
@@ -78,6 +87,11 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     private User selectedUser = null;
 
     /**
+     * long selected user (application user
+     */
+    private User mainUser;
+
+    /**
      * <b>Methode qui permet de créer l'activité.</b>
      *  Affiche la listes des utilisateurs
      *
@@ -104,6 +118,7 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
         bDelete.setOnClickListener(this);
         bAdd.setOnClickListener(this);
         bModify.setOnClickListener(this);
+
     }
 
     /**
@@ -197,7 +212,7 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
      * Ouvre l'activité d'ajout d'utilisateur.
      */
     private void showNewUser() {
-        Intent I = new Intent(UsersSettingsActivity.this, BraceletSyncActivity.class);
+        Intent I = new Intent(UsersSettingsActivity.this, NewUserSettingName.class);//BraceletSyncActivity.class);
         startActivity(I);
     }
 
@@ -269,6 +284,14 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
                 listViewUsers.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listUsers));
                 listViewUsers.setItemChecked(0, true);
                 listViewUsers.setOnItemClickListener(weakCopy);
+                listViewUsers.setOnItemLongClickListener(weakCopy);
+
+                if(users != null){
+                    if(users.get(0) != null){
+                        selectedUser = users.get(0);
+                    }
+                }
+                findMainUser();
             }
 
             @Override
@@ -298,5 +321,40 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         printList();
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        mainUser =(User) listViewUsers.getItemAtPosition(position);
+
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(MAIN_USER, mainUser.getName());
+        editor.commit();
+
+        printMainUser();
+        return false;
+    }
+
+    private void findMainUser(){
+        if(mainUser == null){
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            if(preferences.getString(MAIN_USER, selectedUser.getName()) == null){
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(MAIN_USER, listUsers.get(0).getName());
+            }
+            String mainUserName =  preferences.getString(MAIN_USER, selectedUser.getName());
+
+            for(int i=0; i < listUsers.size(); i++){
+                if(listUsers.get(i).getName().equals(mainUserName))
+                    mainUser = listUsers.get(i);
+            }
+            printMainUser();
+        }
+    }
+    private void printMainUser(){
+        TextView textMainUser = (TextView) findViewById(R.id.mainUser);
+        textMainUser.setText(mainUser.getName() + " is the main user");
     }
 }
