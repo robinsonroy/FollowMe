@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">FollowMe</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="my_music">My Music</string>
-    <string name="radio">Radio</string>
-    <string name="action_users_settings">Users settings</string>
-    <string name="action_rooms_settings">Rooms settings</string>
-    <string name="action_speakers_settings">Speakers settings</string>
-    <string name="action_doors_settings">Doors settings</string>
-    <string name="modify">Modify</string>
-    <string name="add"> + </string>
-    <string name="addNewSpeakerMessageEthernet">Please connect playBox with ethernet</string>
-    <string name="recognizingWait">wait for the recognizing...</string>
-    <string name="and">and</string>
-    <string name="speakerName">Speaker name</string>
-    <string name="validate">Validate</string>
-    <string name="password">Password</string>
-    <string name="wifiTest">Wifi Test</string>
-    <string name="errorWifiMessage">The wifi connection is not established</string>
-    <string name="braceletSynchroMessage">Please press during 3 seconde the bracelet play button</string>
-    <string name="userName">User name</string>
-    <string name="delete">Delete</string>
-    <string name="synchroMessage">Please wait for synchronisation with the SmartBox</string>
-    <string name="roomName">Room name</string>
-    <string name="errorConnection">Connection to the database impossible</string>
-    <string name="sensorSerial">Sensor serial number</string>
-    <string name="braceletID">Bracelet ID</string>
-    <string name="speakerIP">IP Address</string>
+    <string name="app_name" translatable="false">FollowMe</string>
+    <string name="hello_world" translatable="false">Hello world!</string>
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="my_music" translatable="false">My Music</string>
+    <string name="radio" translatable="false">Radio</string>
+    <string name="action_users_settings" translatable="false">Users settings</string>
+    <string name="action_rooms_settings" translatable="false">Rooms settings</string>
+    <string name="action_speakers_settings" translatable="false">Speakers settings</string>
+    <string name="action_doors_settings" translatable="false">Doors settings</string>
+    <string name="modify" translatable="false">Modify</string>
+    <string name="add" translatable="false"> + </string>
+    <string name="addNewSpeakerMessageEthernet" translatable="false">Please connect playBox with ethernet</string>
+    <string name="recognizingWait" translatable="false">wait for the recognizing...</string>
+    <string name="and" translatable="false">and</string>
+    <string name="speakerName" translatable="false">Speaker name</string>
+    <string name="validate" translatable="false">Validate</string>
+    <string name="password" translatable="false">Password</string>
+    <string name="wifiTest" translatable="false">Wifi Test</string>
+    <string name="errorWifiMessage" translatable="false">The wifi connection is not established</string>
+    <string name="braceletSynchroMessage" translatable="false">Please press during 3 seconde the bracelet play button</string>
+    <string name="userName" translatable="false">User name</string>
+    <string name="delete" translatable="false">Delete</string>
+    <string name="synchroMessage" translatable="false">Please wait for synchronisation with the SmartBox</string>
+    <string name="roomName" translatable="false">Room name</string>
+    <string name="errorConnection" translatable="false">Connection to the database impossible</string>
+    <string name="sensorSerial" translatable="false">Sensor serial number</string>
+    <string name="braceletID" translatable="false">Bracelet ID</string>
+    <string name="speakerIP" translatable="false">IP Address</string>
+
 </resources>

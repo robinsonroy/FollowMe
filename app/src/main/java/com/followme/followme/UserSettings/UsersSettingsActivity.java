@@ -69,7 +69,6 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
      */
     private List<User> listUsers;
 
-
     /**
      * Bouton d'ajout d'un utilisateur
      */
@@ -401,9 +400,15 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
                     editor.commit();
                 }
             }
-
-            printMainUser();
         }
+        else{
+            for(int i = 0; i<listUsers.size(); i++){
+                if(mainUser.getId() == listUsers.get(i).getId()){
+                    mainUser = listUsers.get(i);
+                }
+            }
+        }
+        printMainUser();
     }
     private void printMainUser(){
         TextView textMainUser = (TextView) findViewById(R.id.mainUser);
