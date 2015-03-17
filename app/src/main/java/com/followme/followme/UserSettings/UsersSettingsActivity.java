@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,9 +28,12 @@ import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.View.ErrorDialog;
 import com.followme.followme.View.ErrorFinishDialog;
+import com.followme.followme.View.SwipeDismissListViewTouchListener;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit.Callback;
@@ -77,11 +81,6 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     private Button bModify = null;
 
     /**
-     * Button to delete an user
-     */
-    private Button bDelete = null;
-
-    /**
      * position de l'utilsateur selection dans la ListView listViewUsers
      */
     private User selectedUser = null;
@@ -90,6 +89,16 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
      * long selected user (application user
      */
     private User mainUser;
+
+    /**
+     * adaptater for listView
+     */
+    private ArrayAdapter<User> mAdapter;
+
+    /**
+     * user temporary delete of list view
+     */
+    private User mTempUSer;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -114,8 +123,6 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
 
         bAdd = (Button) findViewById(R.id.newUser);
         bModify = (Button) findViewById(R.id.modificationUser);
-        bDelete = (Button) findViewById(R.id.deleteUser);
-        bDelete.setOnClickListener(this);
         bAdd.setOnClickListener(this);
         bModify.setOnClickListener(this);
 
@@ -229,20 +236,24 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     /**
      * delete selected user
      */
-    private void deleteUser() {
+    private void deleteUser(User user) {
         final UsersSettingsActivity weakCopy = this;
-        webConection.getApi().deleteUser(selectedUser.getId(), new Callback<User>() {
+        final User deleteUser = user;
+        webConection.getApi().deleteUser(deleteUser.getId(), new Callback<User>() {
             @Override
             public void success(User user, Response response) {
-                printList();
-
+                //printList();
+                if(deleteUser.getId() == mainUser.getId()){
+                    mainUser = null;
+                    findMainUser();
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
                 ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
                 dialog.openDialog();
-                printList();
+                mAdapter.add(mTempUSer);
             }
         });
     }
@@ -264,8 +275,6 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
             case R.id.modificationUser :
                 showUserModify();
                 break;
-            case R.id.deleteUser :
-                deleteUser();
             default:
                 break;
 
@@ -281,13 +290,42 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
             @Override
             public void success(List<User> users, Response response) {
                 listUsers = users;
-                listViewUsers.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listUsers));
+
+                mAdapter = new ArrayAdapter<User>(weakCopy,
+                        android.R.layout.simple_list_item_single_choice,
+                        listUsers);
+
+                listViewUsers.setAdapter(mAdapter);
+
+                SwipeDismissListViewTouchListener touchListener =
+                        new SwipeDismissListViewTouchListener(
+                                listViewUsers,
+                                new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                                    @Override
+                                    public boolean canDismiss(int position) {
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                        for (int position : reverseSortedPositions) {
+                                            mTempUSer = mAdapter.getItem(position);
+                                            mAdapter.remove(mTempUSer);
+                                            deleteUser(mTempUSer);
+                                        }
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                listViewUsers.setOnTouchListener(touchListener);
+                listViewUsers.setOnScrollListener(touchListener.makeScrollListener());
+
+
                 listViewUsers.setItemChecked(0, true);
                 listViewUsers.setOnItemClickListener(weakCopy);
                 listViewUsers.setOnItemLongClickListener(weakCopy);
 
                 if(users != null){
-                    if(users.get(0) != null){
+                    if(users.size() != 0){
                         selectedUser = users.get(0);
                     }
                 }
@@ -340,21 +378,38 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     private void findMainUser(){
         if(mainUser == null){
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            if(preferences.getString(MAIN_USER, selectedUser.getName()) == null){
+            if(preferences.getString(MAIN_USER, "None") == null){
                 SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(MAIN_USER, listUsers.get(0).getName());
+                editor.putString(MAIN_USER, "None");
             }
-            String mainUserName =  preferences.getString(MAIN_USER, selectedUser.getName());
+            String mainUserName =  preferences.getString(MAIN_USER, "None");
 
             for(int i=0; i < listUsers.size(); i++){
-                if(listUsers.get(i).getName().equals(mainUserName))
+                if(listUsers.get(i).getName().equals(mainUserName)){
                     mainUser = listUsers.get(i);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(MAIN_USER, mainUser.getName());
+                    editor.commit();
+                }
             }
+
+            if(mainUser == null){
+                if(listUsers.size() != 0) {
+                    mainUser = listUsers.get(0);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(MAIN_USER, mainUser.getName());
+                    editor.commit();
+                }
+            }
+
             printMainUser();
         }
     }
     private void printMainUser(){
         TextView textMainUser = (TextView) findViewById(R.id.mainUser);
+        if(mainUser == null){
+            textMainUser.setText("There is no main user");
+        }else
         textMainUser.setText(mainUser.getName() + " is the main user");
     }
 }

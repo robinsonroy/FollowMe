@@ -21,7 +21,7 @@ public class ErrorFinishDialog {
 
     public void openDialog(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(weakCopy);
-        alertDialogBuilder.setMessage("Impossible to add this Bracelet");
+        alertDialogBuilder.setMessage(message);
         alertDialogBuilder.setPositiveButton("OK",
                 new DialogInterface.OnClickListener() {
 

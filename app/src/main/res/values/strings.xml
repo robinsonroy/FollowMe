@@ -11,7 +11,7 @@
     <string name="action_speakers_settings">Speakers settings</string>
     <string name="action_doors_settings">Doors settings</string>
     <string name="modify">Modify</string>
-    <string name="add">Add new one</string>
+    <string name="add"> + </string>
     <string name="addNewSpeakerMessageEthernet">Please connect playBox with ethernet</string>
     <string name="recognizingWait">wait for the recognizing...</string>
     <string name="and">and</string>
