@@ -25,6 +25,7 @@ import com.followme.followme.R;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorDialog;
+import com.followme.followme.View.GsonMessage;
 import com.followme.followme.View.SwipeDismissListViewTouchListener;
 
 import org.parceler.Parcels;
@@ -221,8 +222,8 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
 
             }
             @Override
-            public void failure(RetrofitError retrofitError) {
-                ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
+            public void failure(RetrofitError error) {
+                ErrorDialog dialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
                 dialog.openDialog();
                 mAdapter.add(tempRoom);
             }

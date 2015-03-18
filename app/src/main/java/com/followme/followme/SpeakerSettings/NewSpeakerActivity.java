@@ -23,6 +23,7 @@ import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.UserSettings.NewUserSettingName;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorFinishDialog;
+import com.followme.followme.View.GsonMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -197,7 +198,7 @@ public class NewSpeakerActivity extends Activity implements View.OnClickListener
 
             @Override
             public void failure(RetrofitError error) {
-                ErrorFinishDialog dialog = new ErrorFinishDialog("Impossible to add speaker", "ok", weakCopy);
+                ErrorFinishDialog dialog = new ErrorFinishDialog(GsonMessage.getMessage(error), "ok", weakCopy);
                 dialog.openDialog();
             }
         });

@@ -17,6 +17,7 @@ import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.View.ErrorFinishDialog;
+import com.followme.followme.View.GsonMessage;
 
 import java.util.Random;
 
@@ -169,7 +170,7 @@ public class NewUserSettingName extends Activity implements View.OnClickListener
 
             @Override
             public void failure(RetrofitError error) {
-                ErrorFinishDialog dialog = new ErrorFinishDialog("Impossible to add new user", "OK", weakCopy);
+                ErrorFinishDialog dialog = new ErrorFinishDialog(GsonMessage.getMessage(error), "OK", weakCopy);
                 dialog.openDialog();
             }
         });

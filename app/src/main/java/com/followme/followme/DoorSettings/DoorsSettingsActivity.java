@@ -23,6 +23,7 @@ import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorDialog;
+import com.followme.followme.View.GsonMessage;
 import com.followme.followme.View.SwipeDismissListViewTouchListener;
 
 import retrofit.Callback;
@@ -201,7 +202,7 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
 
             @Override
             public void failure(RetrofitError error) {
-                ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
+                ErrorDialog dialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
                 dialog.openDialog();
                 mAdapter.add(tempDoor);
             }

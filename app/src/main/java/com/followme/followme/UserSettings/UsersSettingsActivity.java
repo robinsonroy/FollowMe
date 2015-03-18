@@ -247,7 +247,7 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
 
             @Override
             public void failure(RetrofitError error) {
-                ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
+                ErrorDialog dialog = new ErrorDialog(error.getMessage().toString(), "OK", weakCopy);
                 dialog.openDialog();
                 mAdapter.add(deleteUser);
             }

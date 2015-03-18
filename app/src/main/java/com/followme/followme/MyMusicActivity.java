@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,13 +29,23 @@ import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorDialog;
+import com.followme.followme.View.GsonMessage;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 /**
  * Created by Robinson on 18/01/15.
@@ -69,6 +80,11 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
     private List<Music> listMusic;
 
     /**
+     * play/pause Button
+     */
+    private Button playPauseButton;
+
+    /**
      * <b>Methode qui permet de créer l'activité.</b>
      *
      * @param savedInstanceState If the activity is being re-initialized after
@@ -82,9 +98,9 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_music);
         webConnection = new WebConnection();
-
-
-        printTest();
+        playPauseButton = (Button) findViewById(R.id.play_pause);
+        playPauseButton.setOnClickListener(this);
+        printListMusic();
     }
 
     /**
@@ -102,6 +118,7 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -179,7 +196,7 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
         startActivity(I);
     }
 
-    private void printTest(){
+    private void printListMusic(){
         listViewMusic =(ListView) findViewById(R.id.listMusic);
         Log.d("where", "printTest in MyMusicActivity");
         final MyMusicActivity weakcopy = this;
@@ -231,7 +248,7 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
 
                 @Override
                 public void failure(RetrofitError error) {
-                    ErrorDialog errorDialog = new ErrorDialog(error.getMessage().toString(), "OK", weakCopy);
+                    ErrorDialog errorDialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
                     errorDialog.openDialog();
                 }
 
@@ -257,21 +274,26 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
     }
 
     private void playPause() {
+        Log.d("play", "play_pause fonction");
         final MyMusicActivity weakCopy = this;
         User user = getMainUser();
         if (user.getId() != -1 || user.getName() != "none" || user.getBraceletID() != -1) {
-            webConnection.getApi().playPause(user, new Callback<User>() {
+            webConnection.getApi().playPause(user.getId(), new Callback<Object>() {
                 @Override
-                public void success(User user, Response response) {
-
+                public void success(Object o, Response response) {
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
-                    ErrorDialog errorDialog = new ErrorDialog("Play/Pause impossible", "OK", weakCopy);
+                    ErrorDialog errorDialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
                     errorDialog.openDialog();
+
+
                 }
             });
+        }else{
+            ErrorDialog errorDialog = new ErrorDialog("Please initialise the main user in user settings", "OK", weakCopy);
+            errorDialog.openDialog();
         }
     }
 

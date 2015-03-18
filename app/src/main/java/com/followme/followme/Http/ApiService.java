@@ -252,17 +252,17 @@ public interface ApiService {
      *          Object with user who wants to play music and the music
      * @param cb
      */
-    @POST("/api/music/play")
+    @POST("/api/music/play_song")
     public void playMusic(@Body PlayMusic playMusic, Callback<PlayMusic> cb);
 
     /**
      * Play or pause for music playing
-     * @param user
-     *       user who wants to stop/play music
+     * @param userID
+     *       id of user who wants to stop/play music
      * @param cb
      *      Callback
      */
-    @POST("/api/music/play_pause")
-    public void playPause(@Body User user, Callback<User> cb);
+    @GET("/api/music/play_pause/{id}")
+    public void playPause(@Path("id") int userID, Callback<Object> cb);
 
 }

@@ -24,6 +24,7 @@ import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorFinishDialog;
+import com.followme.followme.View.GsonMessage;
 
 import org.parceler.Parcels;
 
@@ -131,7 +132,7 @@ public class SensorAddActivity extends Activity implements View.OnClickListener,
 
             @Override
             public void failure(RetrofitError error) {
-                ErrorFinishDialog dialog = new ErrorFinishDialog("Impossible to share room", "ok", weakCopy);
+                ErrorFinishDialog dialog = new ErrorFinishDialog(GsonMessage.getMessage(error), "ok", weakCopy);
                 dialog.openDialog();
             }
         });
@@ -274,7 +275,7 @@ public class SensorAddActivity extends Activity implements View.OnClickListener,
 
             @Override
             public void failure(RetrofitError error) {
-                ErrorFinishDialog dialog = new ErrorFinishDialog("Impossible to add this door", "OK", weakCopy);
+                ErrorFinishDialog dialog = new ErrorFinishDialog(error.getMessage().toString(), "OK", weakCopy);
                 dialog.openDialog();
             }
         });

@@ -21,6 +21,7 @@ import com.followme.followme.R;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorFinishDialog;
+import com.followme.followme.View.GsonMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,8 +169,8 @@ public class NewRoomActivity extends Activity implements View.OnClickListener{
 
             }
             @Override
-            public void failure(RetrofitError retrofitError) {
-                ErrorFinishDialog dialog = new ErrorFinishDialog("Impossible to add Room", "ok", weakCopy);
+            public void failure(RetrofitError error) {
+                ErrorFinishDialog dialog = new ErrorFinishDialog(GsonMessage.getMessage(error), "ok", weakCopy);
                 dialog.openDialog();
 
             }
