@@ -18,11 +18,14 @@ import android.widget.TextView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.Door;
 import com.followme.followme.Model.Room;
+import com.followme.followme.Model.Speaker;
 import com.followme.followme.R;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorDialog;
+import com.followme.followme.View.SwipeDismissListViewTouchListener;
 
 import org.parceler.Parcels;
 
@@ -63,11 +66,6 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
     private Button bAdd = null;
 
     /**
-     * Bouton qui permet de supprimer une pièce.
-     */
-    private Button bDelete = null;
-
-    /**
      * Bouton qui permet de modifier une pièce.
      */
     private Button bModify = null;
@@ -76,6 +74,11 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
      * Posisiton de la room choisi par l'utilisateur dans la ListView
      */
     private Room selectedRoom;
+
+    /**
+     * Adapter for Room ListView
+     */
+    private ArrayAdapter<Room> mAdapter;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -98,11 +101,9 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
         printList();
 
         bAdd = (Button) findViewById(R.id.newRoom);
-        bDelete = (Button) findViewById(R.id.deleteRoom);
         bModify = (Button) findViewById(R.id.modificationRoom);
 
         bAdd.setOnClickListener(this);
-        bDelete.setOnClickListener(this);
         bModify.setOnClickListener(this);
     }
 
@@ -211,18 +212,19 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
         startActivity(I);
     }
 
-    private void deleteRoom() {
+    private void deleteRoom(Room room) {
         final RoomSettingsActivity weakCopy = this;
-        webConection.getApi().deleteRoom(selectedRoom.getId(), new Callback<Room>(){
+        final Room tempRoom = room;
+        webConection.getApi().deleteRoom(room.getId(), new Callback<Room>(){
             @Override
             public void success(Room room, Response response) {
-                printList();
+
             }
             @Override
             public void failure(RetrofitError retrofitError) {
                 ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
                 dialog.openDialog();
-                printList();
+                mAdapter.add(tempRoom);
             }
         });
     }
@@ -242,9 +244,6 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
                 break;
             case R.id.modificationRoom :
                 showModificationRoom();
-                break;
-            case R.id.deleteRoom :
-                deleteRoom();
                 break;
             default:
                 break;
@@ -270,7 +269,33 @@ public class RoomSettingsActivity extends Activity implements View.OnClickListen
             @Override
             public void success(List<Room> rooms, Response response) {
                 listRooms = rooms;
-                listViewRooms.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listRooms));
+                mAdapter = new ArrayAdapter<Room>(weakCopy,
+                        android.R.layout.simple_list_item_single_choice,
+                        listRooms);
+
+                listViewRooms.setAdapter(mAdapter);
+
+                SwipeDismissListViewTouchListener touchListener =
+                        new SwipeDismissListViewTouchListener(
+                                listViewRooms,
+                                new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                                    @Override
+                                    public boolean canDismiss(int position) {
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                        for (int position : reverseSortedPositions) {
+                                            Room tempRoom = mAdapter.getItem(position);
+                                            mAdapter.remove(tempRoom);
+                                            deleteRoom(tempRoom);
+                                        }
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                listViewRooms.setOnTouchListener(touchListener);
+                listViewRooms.setOnScrollListener(touchListener.makeScrollListener());
                 listViewRooms.setItemChecked(0, true);
                 listViewRooms.setOnItemClickListener(weakCopy);
 

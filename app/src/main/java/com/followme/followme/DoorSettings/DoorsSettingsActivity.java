@@ -17,11 +17,13 @@ import android.widget.ListView;
 import com.followme.followme.Http.WebConnection;
 import com.followme.followme.Model.Door;
 import com.followme.followme.Model.Room;
+import com.followme.followme.Model.Speaker;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorDialog;
+import com.followme.followme.View.SwipeDismissListViewTouchListener;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -60,9 +62,9 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
     private Button bAdd = null;
 
     /**
-     * Bouton qui permet de supprimer une porte.
+     * Adapter for Door ListView
      */
-    private Button bDelete = null;
+    private ArrayAdapter<Door> mAdapter;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -86,9 +88,7 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
         printList();
 
         bAdd = (Button) findViewById(R.id.newDoor);
-        bDelete = (Button) findViewById(R.id.deleteDoor);
         bAdd.setOnClickListener(this);
-        bDelete.setOnClickListener(this);
 
     }
 
@@ -190,19 +190,20 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
     /**
      * Supprime une porte (2 capteurs de proximité).
      */
-    private void deleteDoor() {
+    private void deleteDoor(Door door) {
         final DoorsSettingsActivity weakCopy = this;
-        webConnection.getApi().deleteDoor(selectedDoor.getId(), new Callback<Room>() {
+        final Door tempDoor = door;
+        webConnection.getApi().deleteDoor(door.getId(), new Callback<Room>() {
             @Override
             public void success(Room room, Response response) {
-                printList();
+
             }
 
             @Override
             public void failure(RetrofitError error) {
                 ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
                 dialog.openDialog();
-                printList();
+                mAdapter.add(tempDoor);
             }
         });
     }
@@ -221,9 +222,6 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
             case R.id.newDoor :
                 showNewSensor1();
                 break;
-            case R.id.deleteDoor :
-                deleteDoor();
-                break;
             default:
                 break;
 
@@ -236,7 +234,33 @@ public class DoorsSettingsActivity extends Activity implements View.OnClickListe
             @Override
             public void success(List<Door> doors, Response response) {
                 listDoors = doors;
-                listViewDoors.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listDoors));
+                mAdapter = new ArrayAdapter<Door>(weakCopy,
+                        android.R.layout.simple_list_item_single_choice,
+                        listDoors);
+
+                listViewDoors.setAdapter(mAdapter);
+
+                SwipeDismissListViewTouchListener touchListener =
+                        new SwipeDismissListViewTouchListener(
+                                listViewDoors,
+                                new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                                    @Override
+                                    public boolean canDismiss(int position) {
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                        for (int position : reverseSortedPositions) {
+                                            Door tempDoor = mAdapter.getItem(position);
+                                            mAdapter.remove(tempDoor);
+                                            deleteDoor(tempDoor);
+                                        }
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                listViewDoors.setOnTouchListener(touchListener);
+                listViewDoors.setOnScrollListener(touchListener.makeScrollListener());
                 listViewDoors.setItemChecked(0, true);
                 listViewDoors.setOnItemClickListener(weakCopy);
                 Log.d("doors", doors.toString());

@@ -1,10 +1,13 @@
 package com.followme.followme.Http;
 
 import com.followme.followme.Model.Door;
+import com.followme.followme.Model.Music;
+import com.followme.followme.Model.PlayMusic;
 import com.followme.followme.Model.Room;
 import com.followme.followme.Model.Speaker;
 import com.followme.followme.Model.Test;
 import com.followme.followme.Model.User;
+import com.followme.followme.MyMusicActivity;
 
 import java.util.List;
 
@@ -235,8 +238,31 @@ public interface ApiService {
     @DELETE("/api/door/{id}")
     public void deleteDoor(@Path("id") Integer id, Callback<Room> cb);
 
+    /**
+     * Get all music
+     * @param cb
+     *         Callback
+     */
+    @GET("/api/musics")
+    public void getMusics(Callback<List<Music>> cb);
 
+    /**
+     * POST a music to play
+     * @param playMusic
+     *          Object with user who wants to play music and the music
+     * @param cb
+     */
+    @POST("/api/music/play")
+    public void playMusic(@Body PlayMusic playMusic, Callback<PlayMusic> cb);
 
-
+    /**
+     * Play or pause for music playing
+     * @param user
+     *       user who wants to stop/play music
+     * @param cb
+     *      Callback
+     */
+    @POST("/api/music/play_pause")
+    public void playPause(@Body User user, Callback<User> cb);
 
 }

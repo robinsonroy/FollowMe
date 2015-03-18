@@ -52,7 +52,9 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     /**
      * Tag to save main user in share preference
      */
-    public final static String MAIN_USER = "main user name";
+    public final static String MAIN_USER_NAME = "main user name";
+    public final static String MAIN_USER_ID = "main user id";
+    public final static String MAIN_USER_BRACELET = "main user bracelet";
 
     /**
      * Web connection to the database
@@ -93,11 +95,6 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
      * adaptater for listView
      */
     private ArrayAdapter<User> mAdapter;
-
-    /**
-     * user temporary delete of list view
-     */
-    private User mTempUSer;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -252,7 +249,7 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
             public void failure(RetrofitError error) {
                 ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
                 dialog.openDialog();
-                mAdapter.add(mTempUSer);
+                mAdapter.add(deleteUser);
             }
         });
     }
@@ -308,9 +305,9 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
                                     @Override
                                     public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                         for (int position : reverseSortedPositions) {
-                                            mTempUSer = mAdapter.getItem(position);
-                                            mAdapter.remove(mTempUSer);
-                                            deleteUser(mTempUSer);
+                                            User tempUSer = mAdapter.getItem(position);
+                                            mAdapter.remove(tempUSer);
+                                            deleteUser(tempUSer);
                                         }
                                         mAdapter.notifyDataSetChanged();
                                     }
@@ -363,12 +360,7 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         mainUser =(User) listViewUsers.getItemAtPosition(position);
-
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(MAIN_USER, mainUser.getName());
-        editor.commit();
+        save(mainUser);
 
         printMainUser();
         return false;
@@ -377,27 +369,23 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     private void findMainUser(){
         if(mainUser == null){
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            if(preferences.getString(MAIN_USER, "None") == null){
+            if(preferences.getInt(MAIN_USER_ID, -1) == -1){
                 SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(MAIN_USER, "None");
+                editor.putInt(MAIN_USER_ID, -1);
             }
-            String mainUserName =  preferences.getString(MAIN_USER, "None");
+            int mainUserID = preferences.getInt(MAIN_USER_ID, -1);
 
             for(int i=0; i < listUsers.size(); i++){
-                if(listUsers.get(i).getName().equals(mainUserName)){
+                if(listUsers.get(i).getId() == mainUserID){
                     mainUser = listUsers.get(i);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString(MAIN_USER, mainUser.getName());
-                    editor.commit();
+                    save(mainUser);
                 }
             }
 
             if(mainUser == null){
                 if(listUsers.size() != 0) {
                     mainUser = listUsers.get(0);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString(MAIN_USER, mainUser.getName());
-                    editor.commit();
+                   save(mainUser);
                 }
             }
         }
@@ -416,5 +404,14 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
             textMainUser.setText("There is no main user");
         }else
         textMainUser.setText(mainUser.getName() + " is the main user");
+    }
+
+    private void save(User user){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(MAIN_USER_NAME, mainUser.getName());
+        editor.putInt(MAIN_USER_ID, mainUser.getId());
+        editor.putLong(MAIN_USER_BRACELET, mainUser.getBraceletID());
+        editor.commit();
     }
 }

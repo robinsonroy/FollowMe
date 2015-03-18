@@ -32,12 +32,6 @@
             android:layout_centerHorizontal="true">
 
             <Button
-                android:id="@+id/deleteDoor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete"/>
-
-            <Button
                 android:id="@+id/newDoor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -26,22 +26,16 @@
             android:layout_centerHorizontal="true">
 
             <Button
-                android:id="@+id/deleteRoom"
+                android:id="@+id/modificationRoom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/delete"/>
+                android:text="@string/modify"/>
 
             <Button
                 android:id="@+id/newRoom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/add"/>
-
-            <Button
-                android:id="@+id/modificationRoom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/modify"/>
 
         </LinearLayout>
 

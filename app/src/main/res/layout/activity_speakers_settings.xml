@@ -25,12 +25,6 @@
             android:layout_centerHorizontal="true">
 
             <Button
-                android:id="@+id/deleteSpeaker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete"/>
-
-            <Button
                 android:id="@+id/modificationSpeaker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

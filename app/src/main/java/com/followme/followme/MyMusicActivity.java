@@ -2,22 +2,32 @@ package com.followme.followme;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.Http.ApiService;
 import com.followme.followme.Http.WebConnection;
+import com.followme.followme.Model.Music;
+import com.followme.followme.Model.PlayMusic;
 import com.followme.followme.Model.Room;
 import com.followme.followme.Model.Test;
+import com.followme.followme.Model.User;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.SpeakerSettings.SpeakersSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
+import com.followme.followme.View.ErrorDialog;
 
 import java.util.List;
 
@@ -34,7 +44,29 @@ import retrofit.client.Response;
  *  @author Robinson
  *  @version 1.0
  */
-public class MyMusicActivity extends Activity {
+public class MyMusicActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener,AdapterView.OnItemLongClickListener{
+
+    /**
+     * Tag to save main user in share preference
+     */
+    public final static String MAIN_USER_NAME = "main user name";
+    public final static String MAIN_USER_ID = "main user id";
+    public final static String MAIN_USER_BRACELET = "main user bracelet";
+
+    /**
+     * connection with the web server
+     */
+    private WebConnection webConnection;
+
+    /**
+     * Music ListView
+     */
+    private ListView listViewMusic;
+
+    /**
+     * Music List
+     */
+    private List<Music> listMusic;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -49,6 +81,8 @@ public class MyMusicActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_music);
+        webConnection = new WebConnection();
+
 
         printTest();
     }
@@ -146,14 +180,99 @@ public class MyMusicActivity extends Activity {
     }
 
     private void printTest(){
-        try{
-            WebConnection web = new WebConnection();
+        listViewMusic =(ListView) findViewById(R.id.listMusic);
+        Log.d("where", "printTest in MyMusicActivity");
+        final MyMusicActivity weakcopy = this;
+        webConnection.getApi().getMusics(new Callback<List<Music>>() {
+            @Override
+            public void success(List<Music> musics, Response response) {
+                listMusic = musics;
 
-            final MyMusicActivity weakCopy = this;
-            //get music
+                listViewMusic.setAdapter(new ArrayAdapter<Music>(weakcopy, android.R.layout.simple_list_item_single_choice, listMusic));
+                listViewMusic.setOnItemClickListener(weakcopy);
+            }
 
-        }catch (RetrofitError e){
-            Log.d("retrofit", "" + e.getResponse().getStatus());
+            @Override
+            public void failure(RetrofitError error) {
+                ErrorDialog errorDialog = new ErrorDialog("Impossible de get music", "ok", weakcopy);
+                errorDialog.openDialog();
+            }
+        });
+    }
+
+
+
+
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        switch (id){
+            case R.id.play_pause :
+                playPause();
+                break;
+            default:
+                break;
         }
     }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        User user = getMainUser();
+
+        if(user.getId() != -1 || user.getName() != "none" || user.getBraceletID() != -1){
+            final MyMusicActivity weakCopy = this;
+            webConnection.getApi().playMusic(new PlayMusic(listMusic.get(position), user),  new Callback<PlayMusic>() {
+                @Override
+                public void success(PlayMusic playMusic, Response response) {
+
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    ErrorDialog errorDialog = new ErrorDialog(error.getMessage().toString(), "OK", weakCopy);
+                    errorDialog.openDialog();
+                }
+
+            });
+        }else{
+            ErrorDialog errorDialog = new ErrorDialog("Please initialise the main user in user settings", "OK", this);
+            errorDialog.openDialog();
+        }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        return false;
+    }
+    private User getMainUser(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        User user = new User();
+        user.setId(preferences.getInt(MAIN_USER_ID, -1));
+        user.setBraceletID(preferences.getLong(MAIN_USER_BRACELET, -1));
+        user.setName(preferences.getString(MAIN_USER_NAME, "none"));
+
+        return user;
+    }
+
+    private void playPause() {
+        final MyMusicActivity weakCopy = this;
+        User user = getMainUser();
+        if (user.getId() != -1 || user.getName() != "none" || user.getBraceletID() != -1) {
+            webConnection.getApi().playPause(user, new Callback<User>() {
+                @Override
+                public void success(User user, Response response) {
+
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    ErrorDialog errorDialog = new ErrorDialog("Play/Pause impossible", "OK", weakCopy);
+                    errorDialog.openDialog();
+                }
+            });
+        }
+    }
+
 }

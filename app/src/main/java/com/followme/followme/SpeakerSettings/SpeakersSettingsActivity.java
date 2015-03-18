@@ -1,5 +1,6 @@
 package com.followme.followme.SpeakerSettings;
 
+import java.util.ArrayList;
 import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
@@ -19,11 +20,13 @@ import com.followme.followme.DoorSettings.DoorsSettingsActivity;
 import com.followme.followme.Http.WebConnection;
 import com.followme.followme.Model.Room;
 import com.followme.followme.Model.Speaker;
+import com.followme.followme.Model.User;
 import com.followme.followme.R;
 import com.followme.followme.RoomSettings.ModifyRoomActivity;
 import com.followme.followme.RoomSettings.RoomSettingsActivity;
 import com.followme.followme.UserSettings.UsersSettingsActivity;
 import com.followme.followme.View.ErrorDialog;
+import com.followme.followme.View.SwipeDismissListViewTouchListener;
 
 import org.parceler.Parcels;
 
@@ -66,14 +69,14 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
     private Button bModify = null;
 
     /**
-     * delete button
-     */
-    private Button bDelete = null;
-
-    /**
      * speaker selected
      */
     private Speaker selectedSpeaker = null;
+
+    /**
+     * Adapter for Speaker listView
+     */
+    private ArrayAdapter<Speaker> mAdapter;
 
     /**
      * <b>Methode qui permet de créer l'activité.</b>
@@ -98,10 +101,8 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
 
         bAdd = (Button) findViewById(R.id.newSpeaker);
         bModify = (Button) findViewById(R.id.modificationSpeaker);
-        bDelete = (Button) findViewById(R.id.deleteSpeaker);
         bAdd.setOnClickListener(this);
         bModify.setOnClickListener(this);
-        bDelete.setOnClickListener(this);
 
     }
 
@@ -214,19 +215,20 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
     /**
      * delete selected speaker
      */
-    private void deleteSpeaker() {
+    private void deleteSpeaker(Speaker speaker) {
         final SpeakersSettingsActivity weakCopy = this;
-        webConection.getApi().deleteSpeaker(selectedSpeaker.getId(), new Callback<Speaker>() {
+        final Speaker tempSpeaker = speaker;
+        webConection.getApi().deleteSpeaker(speaker.getId(), new Callback<Speaker>() {
             @Override
             public void success(Speaker speaker, Response response) {
-                printList();
+
             }
 
             @Override
             public void failure(RetrofitError error) {
                 ErrorDialog dialog = new ErrorDialog("Delete Error", "OK", weakCopy);
                 dialog.openDialog();
-                printList();
+                mAdapter.add(tempSpeaker);
             }
         });
 
@@ -249,10 +251,6 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
 
             case R.id.modificationSpeaker :
                 showSpeakerModify();
-                break;
-
-            case R.id.deleteSpeaker :
-                deleteSpeaker();
                 break;
 
             default:
@@ -280,7 +278,34 @@ public class SpeakersSettingsActivity extends Activity implements View.OnClickLi
             @Override
             public void success(List<Speaker> speakers, Response response) {
                 listSpeakers = speakers;
-                listViewSpeakers.setAdapter(new ArrayAdapter<>(weakCopy, android.R.layout.simple_list_item_single_choice, listSpeakers));
+
+                mAdapter = new ArrayAdapter<Speaker>(weakCopy,
+                        android.R.layout.simple_list_item_single_choice,
+                        listSpeakers);
+
+                listViewSpeakers.setAdapter(mAdapter);
+
+                SwipeDismissListViewTouchListener touchListener =
+                        new SwipeDismissListViewTouchListener(
+                                listViewSpeakers,
+                                new SwipeDismissListViewTouchListener.DismissCallbacks() {
+                                    @Override
+                                    public boolean canDismiss(int position) {
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+                                        for (int position : reverseSortedPositions) {
+                                            Speaker tempSpeaker = mAdapter.getItem(position);
+                                            mAdapter.remove(tempSpeaker);
+                                            deleteSpeaker(tempSpeaker);
+                                        }
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                listViewSpeakers.setOnTouchListener(touchListener);
+                listViewSpeakers.setOnScrollListener(touchListener.makeScrollListener());
                 listViewSpeakers.setItemChecked(0, true);
                 listViewSpeakers.setOnItemClickListener(weakCopy);
 

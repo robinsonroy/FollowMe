@@ -14,8 +14,11 @@ public class User {
     private int id;
     @SerializedName("name")
     private String name;
-    @SerializedName("braceletID")
+    @SerializedName("bracelet_id")
     private long braceletID;
+
+    public User() {
+    }
 
     @Override
     public String toString() {

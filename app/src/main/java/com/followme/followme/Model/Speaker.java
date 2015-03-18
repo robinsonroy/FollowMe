@@ -19,7 +19,7 @@ public class Speaker {
     @SerializedName("room")
     private Room room;
 
-    @SerializedName("IP")
+    @SerializedName("ip_address")
     private String IP;
 
     public int getId() {
