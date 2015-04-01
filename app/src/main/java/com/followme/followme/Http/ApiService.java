@@ -265,4 +265,7 @@ public interface ApiService {
     @GET("/api/music/play_pause/{id}")
     public void playPause(@Path("id") int userID, Callback<Object> cb);
 
+    @GET("/api/music/volume/{volume}")
+    public void changeVolume(@Path("volume") int volume, Callback<Object> cb);
+
 }

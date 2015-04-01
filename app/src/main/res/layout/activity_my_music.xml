@@ -2,28 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ListView
-        android:id="@+id/listMusic"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:choiceMode="singleChoice"
-        android:paddingBottom="40dp"
-        android:paddingTop="30dp"
-        >
-    </ListView>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true">
-
-        <Button
-            android:id="@+id/play_pause"
-            android:layout_width="wrap_content"
+        <ListView
+            android:id="@+id/listMusic"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/play_pause"/>
+            android:choiceMode="singleChoice"
+            android:paddingBottom="85dp"
+            android:paddingTop="10dp"/>
 
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical">
+
+            <SeekBar
+                android:id="@+id/volumeSeekBar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:max="100"/>
+
+            <Button
+                android:id="@+id/play_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/play_pause"
+                />
+
+        </LinearLayout>
+
 
 </RelativeLayout>

@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.followme.followme.DoorSettings.DoorsSettingsActivity;
@@ -55,7 +56,7 @@ import retrofit.mime.TypedByteArray;
  *  @author Robinson
  *  @version 1.0
  */
-public class MyMusicActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener,AdapterView.OnItemLongClickListener{
+public class MyMusicActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener,AdapterView.OnItemLongClickListener, SeekBar.OnSeekBarChangeListener{
 
     /**
      * Tag to save main user in share preference
@@ -85,6 +86,16 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
     private Button playPauseButton;
 
     /**
+     * volume seek bar
+     */
+    private SeekBar seekBarVolume;
+
+    /**
+     * volume number
+     */
+    private int volume;
+
+    /**
      * <b>Methode qui permet de créer l'activité.</b>
      *
      * @param savedInstanceState If the activity is being re-initialized after
@@ -100,6 +111,8 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
         webConnection = new WebConnection();
         playPauseButton = (Button) findViewById(R.id.play_pause);
         playPauseButton.setOnClickListener(this);
+        seekBarVolume = (SeekBar) findViewById(R.id.volumeSeekBar);
+        seekBarVolume.setOnSeekBarChangeListener(this);
         printListMusic();
     }
 
@@ -285,11 +298,10 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
 
                 @Override
                 public void failure(RetrofitError error) {
-                    ErrorDialog errorDialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
-                    errorDialog.openDialog();
-
-
+                    //ErrorDialog dialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
+                    //dialog.openDialog();
                 }
+
             });
         }else{
             ErrorDialog errorDialog = new ErrorDialog("Please initialise the main user in user settings", "OK", weakCopy);
@@ -297,4 +309,37 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
         }
     }
 
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        int min = 40;
+        int max = 100;
+        if(progress > 5){
+            volume = ((progress) * (max-min))/100 + min;
+        }else volume = 0;
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        Log.i("volume", "" + volume);
+        final MyMusicActivity weakCopy = this;
+
+        webConnection.getApi().changeVolume(volume, new Callback<Object>() {
+            @Override
+            public void success(Object o, Response response) {
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                ErrorDialog errorDialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
+                errorDialog.openDialog();
+            }
+        });
+    }
 }
