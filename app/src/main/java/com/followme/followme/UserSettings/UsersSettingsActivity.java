@@ -230,7 +230,9 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
     }
 
     /**
-     * delete selected user
+     * delete user
+     * @param user
+     *         user to delete in database
      */
     private void deleteUser(User user) {
         final UsersSettingsActivity weakCopy = this;
@@ -357,6 +359,14 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
         printList();
     }
 
+    /**
+     * When main user is select (long click)
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     * @return
+     */
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         mainUser =(User) listViewUsers.getItemAtPosition(position);
@@ -366,6 +376,9 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
         return false;
     }
 
+    /**
+     * check, save and print main user
+     */
     private void findMainUser(){
         if(mainUser == null){
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -398,6 +411,10 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
         }
         printMainUser();
     }
+
+    /**
+     * print main user name on activity
+     */
     private void printMainUser(){
         TextView textMainUser = (TextView) findViewById(R.id.mainUser);
         if(mainUser == null){
@@ -406,6 +423,11 @@ public class UsersSettingsActivity extends Activity implements View.OnClickListe
         textMainUser.setText(mainUser.getName() + " is the main user");
     }
 
+    /**
+     * Save main user
+     * @param user
+     *      user to put main user
+     */
     private void save(User user){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();

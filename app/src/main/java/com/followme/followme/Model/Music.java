@@ -27,8 +27,10 @@ public class Music {
 
     @Override
     public String toString() {
-        return  artiste + " | " +
-                name;
+        if(artiste.equals(""))
+        return  name;
+        else
+        return  name + "\n" + artiste;
     }
 
     public int getId() {

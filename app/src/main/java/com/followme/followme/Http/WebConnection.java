@@ -16,7 +16,7 @@ public class WebConnection {
     {
         RestAdapter adapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
-                .setEndpoint("http://followme.techpaf.com")
+                .setEndpoint("http://172.20.10.10/web/app.php")//"http://followme.techpaf.com")//
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
         api = adapter.create(ApiService.class);

@@ -111,8 +111,8 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
         webConnection = new WebConnection();
         playPauseButton = (Button) findViewById(R.id.play_pause);
         playPauseButton.setOnClickListener(this);
-        seekBarVolume = (SeekBar) findViewById(R.id.volumeSeekBar);
-        seekBarVolume.setOnSeekBarChangeListener(this);
+        //seekBarVolume = (SeekBar) findViewById(R.id.volumeSeekBar);
+        ///seekBarVolume.setOnSeekBarChangeListener(this);
         printListMusic();
     }
 
@@ -224,15 +224,11 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
 
             @Override
             public void failure(RetrofitError error) {
-                ErrorDialog errorDialog = new ErrorDialog("Impossible de get music", "ok", weakcopy);
+                ErrorDialog errorDialog = new ErrorDialog("Impossible to get music", "ok", weakcopy);
                 errorDialog.openDialog();
             }
         });
     }
-
-
-
-
 
     @Override
     public void onClick(View v) {
@@ -261,8 +257,8 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
 
                 @Override
                 public void failure(RetrofitError error) {
-                    ErrorDialog errorDialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
-                    errorDialog.openDialog();
+                    //ErrorDialog errorDialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
+                    //errorDialog.openDialog();
                 }
 
             });
@@ -276,6 +272,7 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         return false;
     }
+
     private User getMainUser(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         User user = new User();
@@ -298,8 +295,8 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
 
                 @Override
                 public void failure(RetrofitError error) {
-                    //ErrorDialog dialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
-                    //dialog.openDialog();
+                    ErrorDialog dialog = new ErrorDialog(error.getMessage().toString(), "OK", weakCopy);
+                    dialog.openDialog();
                 }
 
             });
@@ -329,7 +326,7 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
         Log.i("volume", "" + volume);
         final MyMusicActivity weakCopy = this;
 
-        webConnection.getApi().changeVolume(volume, new Callback<Object>() {
+        /*webConnection.getApi().changeVolume(volume, new Callback<Object>() {
             @Override
             public void success(Object o, Response response) {
 
@@ -340,6 +337,6 @@ public class MyMusicActivity extends Activity implements View.OnClickListener, A
                 ErrorDialog errorDialog = new ErrorDialog(GsonMessage.getMessage(error), "OK", weakCopy);
                 errorDialog.openDialog();
             }
-        });
+        });*/
     }
 }
